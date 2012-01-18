@@ -14,6 +14,9 @@ import com.akjava.bvh.client.NameAndChannel;
 import com.akjava.bvh.client.Vec3;
 import com.akjava.bvh.client.gwt.BoxData;
 import com.akjava.bvh.client.gwt.BoxDataParser;
+import com.akjava.gwt.bvhtools.client.file.BVHDataContainer;
+import com.akjava.gwt.bvhtools.client.file.BVHDataListener;
+import com.akjava.gwt.bvhtools.client.file.FileDataContainer;
 import com.akjava.gwt.bvhtools.client.player.SimpleDemoEntryPoint;
 import com.akjava.gwt.bvhtools.client.player.list.BVHFileWidget;
 import com.akjava.gwt.bvhtools.client.player.list.DataListCell;
@@ -779,9 +782,17 @@ Timer timer=new Timer(){
 		//update labels
 	}
 	private JsArray<File> lastSelectedFiles;
+	
+	private BVHDataListener bvhDataListener;
 	@Override
 	public void createControl(Panel parent) {
-		
+		bvhDataListener=new BVHDataListener() {
+			
+			@Override
+			public void dataLoaded(String text) {
+				parseBVH(text);
+			}
+		};
 		parent.add(loadingLabel);
 		
 
@@ -802,12 +813,17 @@ Timer timer=new Timer(){
 				
 				lastSelectedFiles = FileUtils.toFile(event.getNativeEvent());
 				
+				FileDataContainer firstOne=null;
 				for(int i=0;i<lastSelectedFiles.length();i++){
-					bvhFileList.add(lastSelectedFiles.get(i));
+					FileDataContainer container=new FileDataContainer(lastSelectedFiles.get(i));
+					if(i==0){
+						firstOne=container;
+					}
+					bvhFileList.add(container);
 				}
 				
 				dataListCell.setDatas(bvhFileList);
-				dataListCell.setSelection(lastSelectedFiles.get(0));
+				dataListCell.setSelection(firstOne);
 				//bvhCellList.setRowCount(bvhFileList.size(), true);
 				//bvhCellList.setRowData(bvhFileList);
 				
@@ -845,7 +861,7 @@ Timer timer=new Timer(){
 				if(bvhFileList.size()==0){
 					return;
 				}
-				File file=dataListCell.getSelection();
+				BVHDataContainer file=dataListCell.getSelection();
 				int index=bvhFileList.indexOf(file);
 				index--;
 				if(index<0){
@@ -904,17 +920,19 @@ Timer timer=new Timer(){
 		*/
 		
 		
-		dataListCell = new DataListCell<File>(new DataListRenderer<File>(){
+		dataListCell = new DataListCell<BVHDataContainer>(new DataListRenderer<BVHDataContainer>(){
 			@Override
-			public Widget createWidget(File data,DataListCell<File> dataList) {
+			public Widget createWidget(BVHDataContainer data,DataListCell<BVHDataContainer> dataList) {
 
 				return new BVHFileWidget(data,dataList);
 			}});
 		dataListCell.setHeight("60px");
 		parent.add(dataListCell);
-		dataListCell.setListener(new ChangeSelectionListener<File>() {
+		dataListCell.setListener(new ChangeSelectionListener<BVHDataContainer>() {
 			@Override
-			public void onChangeSelection(File data) {
+			public void onChangeSelection(BVHDataContainer data) {
+				
+				/*
 				final FileReader reader=FileReader.createFileReader();
 				reader.setOnLoad(new FileHandler() {
 					@Override
@@ -923,6 +941,8 @@ Timer timer=new Timer(){
 					}
 				});
 				reader.readAsText(data,"utf-8");
+				*/
+				data.readText(bvhDataListener);
 			}
 		});
 		HorizontalPanel dataControls=new HorizontalPanel();
@@ -935,7 +955,7 @@ Timer timer=new Timer(){
 				if(bvhFileList.size()==0){
 					return;
 				}
-				File file=dataListCell.getSelection();
+				BVHDataContainer file=dataListCell.getSelection();
 				int index=bvhFileList.indexOf(file);
 				bvhFileList.remove(file);
 				if(index>=bvhFileList.size()){
@@ -1112,12 +1132,17 @@ Timer timer=new Timer(){
 			return;
 		}
 		//bvhFileList.clear();
+		FileDataContainer firstOne=null;
 		for(int i=0;i<lastSelectedFiles.length();i++){
-			bvhFileList.add(lastSelectedFiles.get(i));
+			FileDataContainer container=new FileDataContainer(lastSelectedFiles.get(i));
+			if(i==0){
+				firstOne=container;
+			}
+			bvhFileList.add(container);
 		}
 		
 		dataListCell.setDatas(bvhFileList);
-		dataListCell.setSelection(lastSelectedFiles.get(0));
+		dataListCell.setSelection(firstOne);
 	}
 
 	protected void doChangeVisibleBodyMesh() {
@@ -1130,7 +1155,7 @@ Timer timer=new Timer(){
 		if(bvhFileList.size()==0){
 			return;
 		}
-		File file=dataListCell.getSelection();
+		BVHDataContainer file=dataListCell.getSelection();
 		int index=bvhFileList.indexOf(file);
 		index++;
 		if(index>bvhFileList.size()-1){
@@ -1167,10 +1192,10 @@ Timer timer=new Timer(){
 	}
 	
 	Clock clock=new Clock();
-	private List<File> bvhFileList=new ArrayList<File>();
+	private List<BVHDataContainer> bvhFileList=new ArrayList<BVHDataContainer>();
 	//private CellList<File> bvhCellList;
 	//private SingleSelectionModel<File> fileSelectionModel;
-	private DataListCell<File> dataListCell;
+	private DataListCell<BVHDataContainer> dataListCell;
 
 	
 	private int currentLoop=0;
@@ -1288,6 +1313,6 @@ Timer timer=new Timer(){
 
 	@Override
 	public String getTabTitle() {
-		return "BVH M-Creator";
+		return "BVH Player";
 	}
 }
