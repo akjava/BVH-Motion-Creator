@@ -8,6 +8,8 @@ import com.akjava.bvh.client.BVHMotion;
 import com.akjava.bvh.client.BVHParser;
 import com.akjava.bvh.client.BVHParser.InvalidLineException;
 import com.akjava.bvh.client.BVHWriter;
+import com.akjava.gwt.bvhtools.client.BVHTools;
+import com.akjava.gwt.bvhtools.client.file.TextAreaDataContainer;
 import com.akjava.gwt.html5.client.file.File;
 import com.akjava.gwt.html5.client.file.FileHandler;
 import com.akjava.gwt.html5.client.file.FileReader;
@@ -81,9 +83,21 @@ private VerticalPanel panel;
 			}
 		});
 		
+		bvhContainer=new TextAreaDataContainer("Striped Data",textArea);
+		
+		Button play=new Button("Play");
+		panel.add(play);
+		play.addClickHandler(new ClickHandler() {
+			
+			@Override
+			public void onClick(ClickEvent event) {
+				BVHTools.getInstance().addBVHData(bvhContainer);
+			}
+		});
+		
 	}
 	
-
+	private TextAreaDataContainer bvhContainer;
 	
 	
 	

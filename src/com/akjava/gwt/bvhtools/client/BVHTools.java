@@ -83,6 +83,10 @@ import com.google.gwt.user.client.ui.Widget;
  */
 public class BVHTools extends SimpleDemoEntryPoint {
 
+	private static BVHTools bvhTools;
+	public static BVHTools getInstance(){
+		return bvhTools;
+	}
 	final Projector projector=THREE.Projector();
 	@Override
 	public void onMouseClick(ClickEvent event) {
@@ -143,6 +147,7 @@ public class BVHTools extends SimpleDemoEntryPoint {
 	private Map<String,BoxData> boxDatas;
 	@Override
 	public void initializeOthers(WebGLRenderer renderer) {
+		bvhTools=this;
 		cameraY=10;
 		defaultZoom=5;
 		canvas.setClearColorHex(0xcccccc);
@@ -1185,6 +1190,10 @@ Timer timer=new Timer(){
 	//private int poseIndex;
 	
 	private void updatePoseIndex(int index){
+		if(index>=bvh.getFrames()){
+			log("invalid frame:"+index);
+			return;
+		}
 		//poseIndex=index;
 		currentFrameRange.setValue(index);
 		currentFrameLabel.setText((index+1)+"/"+bvh.getFrames());
@@ -1299,6 +1308,25 @@ Timer timer=new Timer(){
 			}
 	
 		}
+	}
+	
+	public void addBVHData(BVHDataContainer dataContainer){
+		
+		if(!existsBVHData(dataContainer)){
+			bvhFileList.add(dataContainer);
+		}
+		
+		dataListCell.setDatas(bvhFileList);
+		dataListCell.setSelection(dataContainer);
+		tabPanel.selectTab(0);
+	}
+	private boolean existsBVHData(BVHDataContainer dataContainer){
+		for(BVHDataContainer container:bvhFileList){
+			if(container.getName().equals(dataContainer.getName())){
+				return true;
+			}
+		}
+		return false;
 	}
 	
 	@Override
