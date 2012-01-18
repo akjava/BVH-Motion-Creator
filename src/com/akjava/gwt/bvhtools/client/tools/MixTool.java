@@ -31,11 +31,11 @@ import com.google.gwt.user.client.ui.ScrollPanel;
 import com.google.gwt.user.client.ui.TextArea;
 import com.google.gwt.user.client.ui.VerticalPanel;
 
-public class MixTool {
-private VerticalPanel panel;
+public class MixTool extends AbstractTool{
+
 private File firstFile,secondFile;
 	public MixTool(VerticalPanel panel){
-		this.panel=panel;
+		super(panel);
 
 		
 		FileUpload upload=new FileUpload();
@@ -120,6 +120,7 @@ private File firstFile,secondFile;
 			}
 		});
 		
+		panel.add(createPlayButton("MixedData", textArea));
 	}
 	
 	private Map<String,Boolean> useMap=new HashMap<String,Boolean>();

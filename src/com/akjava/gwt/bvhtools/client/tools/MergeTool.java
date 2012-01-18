@@ -26,10 +26,10 @@ import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.TextArea;
 import com.google.gwt.user.client.ui.VerticalPanel;
 
-public class MergeTool {
-private VerticalPanel panel;
+public class MergeTool extends AbstractTool {
+
 	public MergeTool(VerticalPanel panel){
-		this.panel=panel;
+		super(panel);
 
 		
 		FileUpload upload=new FileUpload();
@@ -69,6 +69,7 @@ private VerticalPanel panel;
 			}
 		});
 		
+		panel.add(createPlayButton("Merged Data", textArea));
 	}
 	
 

@@ -28,11 +28,11 @@ import com.google.gwt.user.client.ui.TextArea;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.VerticalPanel;
 
-public class ThinTool {
-private VerticalPanel panel;
+public class ThinTool  extends AbstractTool{
+
 private Label logLabel;
 	public ThinTool(VerticalPanel panel){
-		this.panel=panel;
+		super(panel);
 
 		
 		FileUpload upload=new FileUpload();
@@ -109,6 +109,7 @@ private Label logLabel;
 			}
 		});
 		
+		panel.add(createPlayButton("ThinOuted Data", textArea));
 	}
 	
 

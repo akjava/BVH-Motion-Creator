@@ -28,10 +28,10 @@ import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.TextArea;
 import com.google.gwt.user.client.ui.VerticalPanel;
 
-public class StripTool {
-private VerticalPanel panel;
+public class StripTool extends AbstractTool{
+
 	public StripTool(VerticalPanel panel){
-		this.panel=panel;
+		super(panel);
 
 		
 		FileUpload upload=new FileUpload();
@@ -83,21 +83,11 @@ private VerticalPanel panel;
 			}
 		});
 		
-		bvhContainer=new TextAreaDataContainer("Striped Data",textArea);
-		
-		Button play=new Button("Play");
-		panel.add(play);
-		play.addClickHandler(new ClickHandler() {
-			
-			@Override
-			public void onClick(ClickEvent event) {
-				BVHTools.getInstance().addBVHData(bvhContainer);
-			}
-		});
+		panel.add(createPlayButton("Striped Data", textArea));
 		
 	}
 	
-	private TextAreaDataContainer bvhContainer;
+	
 	
 	
 	
