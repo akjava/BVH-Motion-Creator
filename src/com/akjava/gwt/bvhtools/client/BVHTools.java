@@ -31,8 +31,6 @@ import com.akjava.gwt.bvhtools.client.tools.ThinTool;
 import com.akjava.gwt.html5.client.HTML5InputRange;
 import com.akjava.gwt.html5.client.extra.HTML5Builder;
 import com.akjava.gwt.html5.client.file.File;
-import com.akjava.gwt.html5.client.file.FileHandler;
-import com.akjava.gwt.html5.client.file.FileReader;
 import com.akjava.gwt.html5.client.file.FileUtils;
 import com.akjava.gwt.lib.client.LogUtils;
 import com.akjava.gwt.lib.client.widget.cell.util.Benchmark;
@@ -50,6 +48,7 @@ import com.akjava.gwt.three.client.objects.Mesh;
 import com.akjava.gwt.three.client.renderers.WebGLRenderer;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
+import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -74,6 +73,7 @@ import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.PopupPanel;
+import com.google.gwt.user.client.ui.TabLayoutPanel;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
@@ -233,6 +233,12 @@ public class BVHTools extends SimpleDemoEntryPoint {
 				}
 			}
 		});
+		
+		toolsPanel = new TabLayoutPanel(24,Unit.PX);
+		tabPanel.add(toolsPanel,"Tools");
+		
+		
+		
 		new MergeTool(createTabVerticalPanel("Merge"));	
 		new ThinTool(createTabVerticalPanel("ThinOut"));	
 		new StripTool(createTabVerticalPanel("Strip"));	
@@ -242,7 +248,7 @@ public class BVHTools extends SimpleDemoEntryPoint {
 	
 	private VerticalPanel createTabVerticalPanel(String name){
 		VerticalPanel panel=new VerticalPanel();
-		tabPanel.add(panel,name);
+		toolsPanel.add(panel,name);
 		return panel;
 	}
 	
@@ -1214,6 +1220,8 @@ Timer timer=new Timer(){
 	private long remainTime;
 
 	private CheckBox abLoopCheck;
+
+	private TabLayoutPanel toolsPanel;
 	@Override
 	protected void beforeUpdate(WebGLRenderer renderer) {
 		

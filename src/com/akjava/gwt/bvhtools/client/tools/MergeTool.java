@@ -46,7 +46,7 @@ public class MergeTool extends AbstractTool {
 		});
 		panel.add(upload);
 		
-		skipFirst = new CheckBox("Skip First frame from second");
+		skipFirst = new CheckBox("Skip First frame after second bvh");
 		skipFirst.setValue(true);
 		panel.add(skipFirst);
 		

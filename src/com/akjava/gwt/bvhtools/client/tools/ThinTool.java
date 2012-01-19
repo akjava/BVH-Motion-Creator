@@ -50,7 +50,9 @@ private Label logLabel;
 		panel.add(upload);
 		
 		HorizontalPanel valuePanel=new HorizontalPanel();
+		
 		panel.add(valuePanel);
+		valuePanel.add(new Label("thin out by"));
 		thinSize = new TextBox();
 		thinSize.setText("10");//default
 		thinSize.setWidth("60px");
@@ -71,6 +73,7 @@ private Label logLabel;
 				thinSize.setText(values.getValue(values.getSelectedIndex()));
 			}
 		});
+		valuePanel.add(new Label("preset"));
 		valuePanel.add(values);
 		
 		

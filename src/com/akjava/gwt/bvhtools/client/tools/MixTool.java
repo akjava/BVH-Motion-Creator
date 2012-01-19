@@ -140,7 +140,13 @@ private File firstFile,secondFile;
 		
 		int length=bvh1.getFrames();
 		if(bvh2.getFrames()>length){
+			if(!keepShort.getValue()){
 			length=bvh2.getFrames();
+			}
+		}else{
+			if(keepShort.getValue()){
+				length=bvh2.getFrames();
+			}
 		}
 		
 		List<NameAndChannel> channel=bvh1.getNameAndChannels();
