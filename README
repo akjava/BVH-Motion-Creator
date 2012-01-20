@@ -1,0 +1,20 @@
+GWT BVH Motion Creator
+
+Player & Tools
+
+lib-bvh for java/gwt
+tested only CMU Graphics Lab Motion Capture Database bvh files.
+
+included BVH files from CMU Graphics Lab Motion Capture Database
+https://sites.google.com/a/cgspeed.com/cgspeed/motion-capture/cmu-bvh-conversion
+
+
+English Web Site
+http://webgl.akjava.com
+
+Japanese Web Site
+http://webgl.akjava.com/bvh/bvh-motion-creator
+
+---
+Bugs
+Only Tested on Chrome
