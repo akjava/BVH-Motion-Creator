@@ -28,5 +28,5 @@
 <inherits name="com.akjava.gwt.stats.Stats"/>
 <inherits name="com.akjava.gwt.three.Three"/>
 
- <set-property name="user.agent" value="safari"/>
+
 </module>
