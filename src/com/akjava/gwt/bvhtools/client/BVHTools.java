@@ -42,7 +42,9 @@ import com.akjava.gwt.three.client.core.Object3D;
 import com.akjava.gwt.three.client.core.Projector;
 import com.akjava.gwt.three.client.core.Vector3;
 import com.akjava.gwt.three.client.gwt.Clock;
+import com.akjava.gwt.three.client.gwt.GWTThreeUtils;
 import com.akjava.gwt.three.client.gwt.Object3DUtils;
+import com.akjava.gwt.three.client.gwt.ThreeLog;
 import com.akjava.gwt.three.client.lights.Light;
 import com.akjava.gwt.three.client.objects.Mesh;
 import com.akjava.gwt.three.client.renderers.WebGLRenderer;
@@ -252,12 +254,17 @@ public class BVHTools extends SimpleDemoEntryPoint {
 		return panel;
 	}
 	
-	private void doZYX(Object3D target,String lastOrder){
+	private void doRotation(Object3D target,String lastOrder){
+		log(target.getName()+",order="+lastOrder+" "+ThreeLog.get(GWTThreeUtils.radiantToDegree(target.getRotation())));
 		Vector3 vec=target.getRotation();
+		
+		target.setEulerOrder(lastOrder);
+		/*
 		Matrix4 mx=THREE.Matrix4();
 		mx.setRotationFromEuler(vec, lastOrder);
+		vec.setRotationFromMatrix(mx);//in this here,miss rotation because of over 90?
+		*/
 		
-		vec.setRotationFromMatrix(mx);
 	}
 	/*
 	private void doPose(BVH bvh,String line){
@@ -297,6 +304,7 @@ public class BVHTools extends SimpleDemoEntryPoint {
 			NameAndChannel nchannel=bvh.getNameAndChannels().get(i);
 			lastOrder=nchannel.getOrder();
 			Object3D target=jointMap.get(nchannel.getName());
+			
 			switch(nchannel.getChannel()){
 			case Channels.XROTATION:
 				target.getRotation().setX(Math.toRadians(vs[i]));
@@ -332,11 +340,11 @@ public class BVHTools extends SimpleDemoEntryPoint {
 			}
 			
 			if(oldTarget!=null && oldTarget!=target){
-				doZYX(oldTarget,lastOrder);
+				doRotation(oldTarget,lastOrder);
 			}
 			oldTarget=target;
 		}
-		doZYX(oldTarget,lastOrder);//do last one
+		doRotation(oldTarget,lastOrder);//do last one
 	}
 	
 	private Map<String,Object3D> jointMap;
@@ -359,7 +367,7 @@ public class BVHTools extends SimpleDemoEntryPoint {
 		Mesh mesh=THREE.Mesh(THREE.CubeGeometry(.4,.4, .4), THREE.MeshLambertMaterial().color(0x00ff00).build());
 		group.add(mesh);
 		mesh.setName(node.getName());
-		
+		group.setName(node.getName());
 		//initial position
 		group.setPosition(THREE.Vector3(node.getOffset().getX(), node.getOffset().getY(), node.getOffset().getZ()));
 		jointMap.put(node.getName(), group);
