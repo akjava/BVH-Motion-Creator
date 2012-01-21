@@ -34,6 +34,8 @@ import com.google.gwt.user.client.ui.VerticalPanel;
 public class MixTool extends AbstractTool{
 
 private File firstFile,secondFile;
+
+private CheckBox loopShort;
 	public MixTool(VerticalPanel panel){
 		super(panel);
 
@@ -77,6 +79,10 @@ private File firstFile,secondFile;
 		keepShort = new CheckBox("max frame is same as shorter one");
 		keepShort.setValue(true);
 		panel.add(keepShort);
+		
+		loopShort = new CheckBox("loop shorter one");
+		loopShort.setValue(true);
+		panel.add(loopShort);
 		
 		panel.add(new Label("Use BVH1 checks"));
 		ScrollPanel scroll=new ScrollPanel();
@@ -157,15 +163,24 @@ private File firstFile,secondFile;
 			if(i<bvh1.getFrames()){
 				value1=bvh1.getFrameAt(i);
 			}else{
-				//TODO loop support;
+				
+				if(loopShort.getValue() && bvh1.getFrames()>1){
+				int f=(i-bvh1.getFrames())%(bvh1.getFrames()-1);//skip first;
+				value1=bvh1.getFrameAt(f+1);
+				}else{
 				value1=new double[channel.size()];
+				}
 			}
 			
 			if(i<bvh2.getFrames()){
 				value2=bvh2.getFrameAt(i);
 			}else{
-				//TODO loop support;
-				value2=new double[channel.size()];
+				if(loopShort.getValue() && bvh2.getFrames()>1){
+					int f=(i-bvh2.getFrames())%(bvh2.getFrames()-1);//skip first;
+					value2=bvh2.getFrameAt(f+1);
+					}else{
+					value2=new double[channel.size()];
+					}
 			}
 			
 			double[] values=new double[channel.size()];

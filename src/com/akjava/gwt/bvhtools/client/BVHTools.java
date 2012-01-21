@@ -83,8 +83,9 @@ import com.google.gwt.user.client.ui.Widget;
 /**
  * Entry point classes define <code>onModuleLoad()</code>.
  */
-public class BVHTools extends SimpleDemoEntryPoint {
 
+public class BVHTools extends SimpleDemoEntryPoint {
+	private String version="2.1";
 	private static BVHTools bvhTools;
 	public static BVHTools getInstance(){
 		return bvhTools;
@@ -94,37 +95,19 @@ public class BVHTools extends SimpleDemoEntryPoint {
 	public void onMouseClick(ClickEvent event) {
 		int x=event.getX();
 		int y=event.getY();
-		/*
-		if(inEdge(x,y)){
-			screenMove(x,y);
-			return;
-		}*/
+		
 		
 		JsArray<Intersect> intersects=projector.gwtPickIntersects(event.getX(), event.getY(), screenWidth, screenHeight, camera,scene);
 		
 		for(int i=0;i<intersects.length();i++){
 			Intersect sect=intersects.get(i);
-			
-			
-			select(sect.getObject());
 			break;
 		}
 		
 	}
 
 
-	Object3D selectedObject;
 	
-	private void select(Object3D selected){
-		selectedObject=selected;
-		meshScaleX.setValue((int) (selectedObject.getScale().getX()*10));
-		meshScaleY.setValue((int) (selectedObject.getScale().getY()*10));
-		meshScaleZ.setValue((int) (selectedObject.getScale().getZ()*10));
-		
-		positionX.setValue((int) (selectedObject.getPosition().getX()*10));
-		positionY.setValue((int) (selectedObject.getPosition().getY()*10));
-		positionZ.setValue((int) (selectedObject.getPosition().getZ()*10));
-	}
 
 	@Override
 	public void onMouseMove(MouseMoveEvent event) {
@@ -149,6 +132,7 @@ public class BVHTools extends SimpleDemoEntryPoint {
 	private Map<String,BoxData> boxDatas;
 	@Override
 	public void initializeOthers(WebGLRenderer renderer) {
+		log("version:"+version);
 		bvhTools=this;
 		cameraY=10;
 		defaultZoom=5;
@@ -256,7 +240,7 @@ public class BVHTools extends SimpleDemoEntryPoint {
 	}
 	
 	private void doRotation(Object3D target,String lastOrder){
-		log(target.getName()+",order="+lastOrder+" "+ThreeLog.get(GWTThreeUtils.radiantToDegree(target.getRotation())));
+		//log(target.getName()+",order="+lastOrder+" "+ThreeLog.get(GWTThreeUtils.radiantToDegree(target.getRotation())));
 		Vector3 vec=target.getRotation();
 		
 		target.setEulerOrder(lastOrder);
@@ -1353,7 +1337,7 @@ Timer timer=new Timer(){
 	}
 	@Override
 	public String getHtml(){
-		return super.getHtml()+". Sample BVH File from <a href='https://sites.google.com/a/cgspeed.com/cgspeed/motion-capture/cmu-bvh-conversion'>CMU Graphics Lab Motion Capture Database.</a><br/> More Infomation click <a href='http://webgl.akjava.com'>webgl.akjava.com</a>";
+		return "BVH Motion Creator "+version+"<br/>"+super.getHtml()+". Sample BVH File from <a href='https://sites.google.com/a/cgspeed.com/cgspeed/motion-capture/cmu-bvh-conversion'>CMU Graphics Lab Motion Capture Database.</a><br/> More Infomation click <a href='http://webgl.akjava.com'>webgl.akjava.com</a>";
 	}
 
 	@Override

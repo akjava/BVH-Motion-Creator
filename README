@@ -18,3 +18,11 @@ http://webgl.akjava.com/bvh/bvh-motion-creator
 ---
 Bugs
 Only Tested on Chrome
+
+
+Change Log
+------
+2.1
+fix over 90 angle problem
+Mix tool support loop option
+add TextTool
