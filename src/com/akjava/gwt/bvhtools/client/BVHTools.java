@@ -27,6 +27,7 @@ import com.akjava.gwt.bvhtools.client.tools.CalculateTool;
 import com.akjava.gwt.bvhtools.client.tools.MergeTool;
 import com.akjava.gwt.bvhtools.client.tools.MixTool;
 import com.akjava.gwt.bvhtools.client.tools.StripTool;
+import com.akjava.gwt.bvhtools.client.tools.TextTool;
 import com.akjava.gwt.bvhtools.client.tools.ThinTool;
 import com.akjava.gwt.html5.client.HTML5InputRange;
 import com.akjava.gwt.html5.client.extra.HTML5Builder;
@@ -37,7 +38,6 @@ import com.akjava.gwt.lib.client.widget.cell.util.Benchmark;
 import com.akjava.gwt.three.client.THREE;
 import com.akjava.gwt.three.client.core.Geometry;
 import com.akjava.gwt.three.client.core.Intersect;
-import com.akjava.gwt.three.client.core.Matrix4;
 import com.akjava.gwt.three.client.core.Object3D;
 import com.akjava.gwt.three.client.core.Projector;
 import com.akjava.gwt.three.client.core.Vector3;
@@ -246,6 +246,7 @@ public class BVHTools extends SimpleDemoEntryPoint {
 		new StripTool(createTabVerticalPanel("Strip"));	
 		new MixTool(createTabVerticalPanel("Mix"));	
 		new CalculateTool(createTabVerticalPanel("Calculate"));	
+		new TextTool(createTabVerticalPanel("Text"));	
 	}
 	
 	private VerticalPanel createTabVerticalPanel(String name){
