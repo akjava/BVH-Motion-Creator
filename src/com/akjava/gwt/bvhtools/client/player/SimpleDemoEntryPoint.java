@@ -79,6 +79,10 @@ public abstract class SimpleDemoEntryPoint extends TabDemoEntryPoint{
 	
 	@Override
 	public void resized(int width, int height) {
+		if(width==0 || height==0){
+			log("ignore 0 risize");
+			return;
+		}
 		screenWidth=width;
 		screenHeight=height;
 		createCamera(scene,width,height);

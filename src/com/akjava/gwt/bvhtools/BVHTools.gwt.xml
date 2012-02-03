@@ -20,10 +20,13 @@
   <source path='client'/>
   <source path='shared'/>
 
+<inherits name="com.google.gwt.json.JSON" /> 
+
 <inherits name="com.akjava.gwt.html5.Html5widget"/>
 
 <inherits name="com.akjava.gwt.lib.Commons"/>
 <inherits name="com.akjava.bvh.Bvh"/>
+<inherits name="com.akjava.gwt.bvh.GWTBVH"/>
 
 <inherits name="com.akjava.gwt.stats.Stats"/>
 <inherits name="com.akjava.gwt.three.Three"/>

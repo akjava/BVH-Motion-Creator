@@ -15,6 +15,7 @@ import com.akjava.bvh.client.NameAndChannel;
 import com.akjava.gwt.html5.client.file.File;
 import com.akjava.gwt.html5.client.file.FileHandler;
 import com.akjava.gwt.html5.client.file.FileReader;
+import com.akjava.gwt.html5.client.file.FileUploadForm;
 import com.akjava.gwt.html5.client.file.FileUtils;
 import com.akjava.gwt.lib.client.LogUtils;
 import com.akjava.gwt.lib.client.widget.cell.SimpleCellTable;
@@ -22,13 +23,8 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ChangeHandler;
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.cellview.client.CellTable;
 import com.google.gwt.user.cellview.client.TextColumn;
-import com.google.gwt.user.client.ui.Button;
-import com.google.gwt.user.client.ui.FileUpload;
-import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.ScrollPanel;
 import com.google.gwt.user.client.ui.TextArea;
 import com.google.gwt.user.client.ui.VerticalPanel;
@@ -39,16 +35,17 @@ private VerticalPanel panel;
 		this.panel=panel;
 
 		
-		FileUpload upload=new FileUpload();
-		upload.getElement().setAttribute("multiple", "multiple");
-		upload.addChangeHandler(new ChangeHandler() {
+	
+		final FileUploadForm upload=new FileUploadForm();
+		upload.getFileUpload().getElement().setAttribute("multiple", "multiple");
+		upload.getFileUpload().addChangeHandler(new ChangeHandler() {
 			
 			@Override
 			public void onChange(ChangeEvent event) {
 				JsArray<File> files=FileUtils.toFile(event.getNativeEvent());
 				
 				setFile(files);
-				
+				upload.reset();
 			}
 		});
 		panel.add(upload);

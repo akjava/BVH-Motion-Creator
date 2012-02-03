@@ -1,22 +1,31 @@
 package com.akjava.gwt.bvhtools.client;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import com.akjava.bvh.client.BVH;
+import com.akjava.bvh.client.BVHMotion;
 import com.akjava.bvh.client.BVHNode;
 import com.akjava.bvh.client.BVHParser;
+import com.akjava.bvh.client.BVHParser.InvalidLineException;
 import com.akjava.bvh.client.BVHParser.ParserListener;
+import com.akjava.bvh.client.BVHWriter;
 import com.akjava.bvh.client.Channels;
 import com.akjava.bvh.client.NameAndChannel;
 import com.akjava.bvh.client.Vec3;
-import com.akjava.bvh.client.gwt.BoxData;
-import com.akjava.bvh.client.gwt.BoxDataParser;
+import com.akjava.gwt.bvh.client.BoxData;
+import com.akjava.gwt.bvh.client.BoxDataParser;
+import com.akjava.gwt.bvh.client.poseframe.PoseEditorData;
+import com.akjava.gwt.bvh.client.poseframe.PoseFrameData;
+import com.akjava.gwt.bvh.client.threejs.AnimationBoneConverter;
+import com.akjava.gwt.bvh.client.threejs.BVHConverter;
 import com.akjava.gwt.bvhtools.client.file.BVHDataContainer;
 import com.akjava.gwt.bvhtools.client.file.BVHDataListener;
 import com.akjava.gwt.bvhtools.client.file.FileDataContainer;
+import com.akjava.gwt.bvhtools.client.file.TextDataContainer;
 import com.akjava.gwt.bvhtools.client.player.SimpleDemoEntryPoint;
 import com.akjava.gwt.bvhtools.client.player.list.BVHFileWidget;
 import com.akjava.gwt.bvhtools.client.player.list.DataListCell;
@@ -32,8 +41,10 @@ import com.akjava.gwt.bvhtools.client.tools.ThinTool;
 import com.akjava.gwt.html5.client.HTML5InputRange;
 import com.akjava.gwt.html5.client.extra.HTML5Builder;
 import com.akjava.gwt.html5.client.file.File;
+import com.akjava.gwt.html5.client.file.FileUploadForm;
 import com.akjava.gwt.html5.client.file.FileUtils;
 import com.akjava.gwt.lib.client.LogUtils;
+import com.akjava.gwt.lib.client.StorageControler;
 import com.akjava.gwt.lib.client.widget.cell.util.Benchmark;
 import com.akjava.gwt.three.client.THREE;
 import com.akjava.gwt.three.client.core.Geometry;
@@ -42,9 +53,9 @@ import com.akjava.gwt.three.client.core.Object3D;
 import com.akjava.gwt.three.client.core.Projector;
 import com.akjava.gwt.three.client.core.Vector3;
 import com.akjava.gwt.three.client.gwt.Clock;
-import com.akjava.gwt.three.client.gwt.GWTThreeUtils;
 import com.akjava.gwt.three.client.gwt.Object3DUtils;
-import com.akjava.gwt.three.client.gwt.ThreeLog;
+import com.akjava.gwt.three.client.gwt.animation.AnimationBone;
+import com.akjava.gwt.three.client.gwt.animation.AnimationBonesData;
 import com.akjava.gwt.three.client.lights.Light;
 import com.akjava.gwt.three.client.objects.Mesh;
 import com.akjava.gwt.three.client.renderers.WebGLRenderer;
@@ -66,15 +77,19 @@ import com.google.gwt.http.client.RequestCallback;
 import com.google.gwt.http.client.RequestException;
 import com.google.gwt.http.client.Response;
 import com.google.gwt.http.client.URL;
+import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.FileUpload;
+import com.google.gwt.user.client.ui.Frame;
 import com.google.gwt.user.client.ui.HorizontalPanel;
+import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.PopupPanel;
+import com.google.gwt.user.client.ui.ScrollPanel;
 import com.google.gwt.user.client.ui.TabLayoutPanel;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.VerticalPanel;
@@ -85,7 +100,8 @@ import com.google.gwt.user.client.ui.Widget;
  */
 
 public class BVHTools extends SimpleDemoEntryPoint {
-	private String version="2.1";
+	private String version="3.0";
+	public static DateTimeFormat dateFormat=DateTimeFormat.getFormat("yy/MM/dd HH:mm");
 	private static BVHTools bvhTools;
 	public static BVHTools getInstance(){
 		return bvhTools;
@@ -130,9 +146,13 @@ public class BVHTools extends SimpleDemoEntryPoint {
 	private Object3D rootGroup,boneContainer,backgroundContainer;
 	
 	private Map<String,BoxData> boxDatas;
+	private VerticalPanel datasPanel;
+	private StorageControler storageControler;
 	@Override
 	public void initializeOthers(WebGLRenderer renderer) {
 		log("version:"+version);
+		loadDefaultBVH("pose.bvh");
+		storageControler = new StorageControler();
 		bvhTools=this;
 		cameraY=10;
 		defaultZoom=5;
@@ -223,7 +243,8 @@ public class BVHTools extends SimpleDemoEntryPoint {
 		toolsPanel = new TabLayoutPanel(24,Unit.PX);
 		tabPanel.add(toolsPanel,"Tools");
 		
-		
+		createDataPanel();
+		createExperimentalPanel();
 		
 		new MergeTool(createTabVerticalPanel("Merge"));	
 		new ThinTool(createTabVerticalPanel("ThinOut"));	
@@ -231,6 +252,199 @@ public class BVHTools extends SimpleDemoEntryPoint {
 		new MixTool(createTabVerticalPanel("Mix"));	
 		new CalculateTool(createTabVerticalPanel("Calculate"));	
 		new TextTool(createTabVerticalPanel("Text"));	
+		
+		updateDatasPanel();
+	}
+	
+	private void createExperimentalPanel(){
+		VerticalPanel expRoot=new VerticalPanel();
+		tabPanel.add(expRoot,"Experimental");
+		
+		Frame doc=new Frame("weight_help.html");
+		doc.setSize("500px", "200px");
+		Button bt=new Button("Open Skin Weight Tool");
+		bt.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				Window.open("weight.html", "weighttool", null);
+			}
+		});
+		expRoot.add(doc);
+		expRoot.add(bt);
+	}
+	
+	private void createDataPanel(){
+		VerticalPanel datasRoot=new VerticalPanel();
+		
+		tabPanel.add(datasRoot,"Datas");
+datasPanel = new VerticalPanel();
+		
+		//datasPanel.setStyleName("debug");
+		ScrollPanel scroll=new ScrollPanel(datasPanel);
+		scroll.setSize("550px", "400px");
+		datasRoot.add(scroll);
+		HorizontalPanel control=new HorizontalPanel();
+		datasRoot.add(control);
+		Button load=new Button("Load Checked Datas");
+		control.add(load);
+		load.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				List<BVHDataContainer> datas=new ArrayList<BVHDataContainer>();
+				int size=datasPanel.getWidgetCount();
+				for(int i=0;i<size;i++){
+					Widget w=datasPanel.getWidget(i);
+					if(w instanceof DataPanel){
+						DataPanel panel=(DataPanel)w;
+						if(panel.isChecked()){
+						TextDataContainer dataContainer=new TextDataContainer(panel.getName(), convertPoseEditorDataToBVH(panel.getPoseEditorData(),bvhForData));
+						datas.add(dataContainer);
+						}
+					}
+				}
+				
+				addBVHDatas(datas);
+			}
+		});
+		
+		Button check=new Button("Check All");
+		control.add(check);
+		check.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				int size=datasPanel.getWidgetCount();
+				for(int i=0;i<size;i++){
+					Widget w=datasPanel.getWidget(i);
+					if(w instanceof DataPanel){
+						DataPanel panel=(DataPanel)w;
+						panel.setChecked(true);
+					}
+				}
+			}
+		});
+		
+		Button uncheck=new Button("Uncheck All");
+		control.add(uncheck);
+		uncheck.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				int size=datasPanel.getWidgetCount();
+				for(int i=0;i<size;i++){
+					Widget w=datasPanel.getWidget(i);
+					if(w instanceof DataPanel){
+						DataPanel panel=(DataPanel)w;
+						panel.setChecked(false);
+					}
+				}
+			}
+		});
+	}
+	
+
+	
+	private void updateDatasPanel(){
+		datasPanel.clear();
+		int index=storageControler.getValue(PoseEditorData.KEY_INDEX, 0);
+		for(int i=index;i>=0;i--){
+			String b64=storageControler.getValue(PoseEditorData.KEY_IMAGE+i,null);
+			String json=storageControler.getValue(PoseEditorData.KEY_DATA+i,null);
+			String head=storageControler.getValue(PoseEditorData.KEY_HEAD+i,null);
+			if(b64!=null && json!=null){
+			DataPanel dp=new DataPanel(i,head,b64,json);
+			//dp.setSize("200px", "200px");
+			datasPanel.add(dp);
+			}
+		}
+	}
+	
+	public class DataPanel extends HorizontalPanel{
+		private int index;
+		private String name;
+		private long cdate;
+		private String json;
+		private CheckBox check;
+		public DataPanel(final int ind,String head,String base64, String text){
+			json=text;
+			this.index=ind;
+			Image img=new Image();
+			img.setUrl(base64);
+			
+			
+			String name_cdate[]=head.split("\t");
+			name=name_cdate[0];
+			cdate=(long)(Double.parseDouble(name_cdate[1]));
+			
+			String dlabel=dateFormat.format(new Date(cdate));
+			add(new Label(dlabel));
+			add(img);
+			
+			final Label nameLabel=new Label(name);
+			nameLabel.setWidth("160px");
+			add(nameLabel);
+			
+			check = new CheckBox();
+			add(check);
+			
+			Button loadBt=new Button("Load");
+			add(loadBt);
+			loadBt.addClickHandler(new ClickHandler() {
+				
+				@Override
+				public void onClick(ClickEvent event) {
+					
+					PoseEditorData ped=getPoseEditorData();
+					
+					
+					if(ped!=null){
+					doLoadPoseEditorData(ped);
+					}else{
+						//TODO error catch
+						Window.alert("load faild");
+					}
+				}
+			});
+			
+		
+			
+			
+			
+			
+			
+		}
+		public void setChecked(boolean bool){
+			check.setValue(bool);
+		}
+		public PoseEditorData getPoseEditorData(){
+			PoseEditorData ped=PoseEditorData.readData(json);
+			if(ped!=null){
+				ped.setFileId(index);
+			}
+			return ped;
+		}
+		public boolean isChecked(){
+			return check.getValue();
+		}
+		
+		public String getJson(){
+			return json;
+		}
+		public String getName(){
+			return name;
+		}
+		
+	
+		protected void doLoadPoseEditorData(PoseEditorData ped) {
+			
+			
+			
+			//parseBVH();
+			
+			TextDataContainer dataContainer=new TextDataContainer(name, convertPoseEditorDataToBVH(ped,bvhForData));
+			addBVHData(dataContainer);
+			
+		}
+		
+		
 	}
 	
 	private VerticalPanel createTabVerticalPanel(String name){
@@ -282,6 +496,38 @@ public class BVHTools extends SimpleDemoEntryPoint {
 		doZYX(oldTarget,lastOrder);//do last one
 	}*/
 	
+	public static String  convertPoseEditorDataToBVH(PoseEditorData ped,BVH bvh){
+		AnimationBoneConverter boneConverter=new AnimationBoneConverter();
+		JsArray<AnimationBone> bones=boneConverter.convertJsonBone(bvh);
+		AnimationBonesData ab=new AnimationBonesData(bones, null);
+		ped.updateMatrix(ab);//current-bone
+		
+		BVH exportBVH=new BVH();
+		
+		BVHConverter converter=new BVHConverter();
+		BVHNode node=converter.convertBVHNode(bones);
+		
+		exportBVH.setHiearchy(node);
+		
+		converter.setChannels(node,0,"XYZ");	//TODO support other order
+		
+		
+		BVHMotion motion=new BVHMotion();
+		motion.setFrameTime(.25);
+		
+		for(PoseFrameData pose:ped.getPoseFrameDatas()){
+			double[] values=converter.angleAndMatrixsToMotion(pose.getAngleAndMatrixs(),BVHConverter.ROOT_POSITION_ROTATE_ONLY,"XYZ");
+			motion.add(values);
+		}
+		motion.setFrames(motion.getMotions().size());//
+		
+		exportBVH.setMotion(motion);
+		//log("frames:"+exportBVH.getFrames());
+		BVHWriter writer=new BVHWriter();
+		
+		String bvhText=writer.writeToString(exportBVH);
+		return bvhText;
+	}
 	private void doPose(BVH bvh,double[] vs){
 		Object3D oldTarget=null;
 		String lastOrder=null;
@@ -482,6 +728,41 @@ public void onError(Request request, Throwable exception) {
 		boneRoot=null;
 		bvh=null;
 	}
+	
+	//TODO can choose in preference
+	private BVH bvhForData;
+	private void loadDefaultBVH(final String path){
+		RequestBuilder builder = new RequestBuilder(RequestBuilder.GET, URL.encode(path));
+			try {
+				builder.sendRequest(null, new RequestCallback() {
+					
+					@Override
+					public void onResponseReceived(Request request, Response response) {
+						
+						String bvhText=response.getText();
+						BVHParser parser=new BVHParser();
+						try {
+							bvhForData=	parser.parse(bvhText);
+						} catch (InvalidLineException e) {
+							log("invalid bvh:"+e.getMessage());
+							e.printStackTrace();
+						}
+					}
+					
+					
+					
+
+@Override
+public void onError(Request request, Throwable exception) {
+				Window.alert("load faild:"+path);
+}
+				});
+			} catch (RequestException e) {
+				log(e.getMessage());
+				e.printStackTrace();
+			}
+	}
+	
 	private void parseBVH(String bvhText){
 		final BVHParser parser=new BVHParser();
 		jointMap=new HashMap<String,Object3D>();
@@ -801,13 +1082,13 @@ Timer timer=new Timer(){
 		
 
 		parent.add(new Label("Load BVH File"));
-		FileUpload file=new FileUpload();
+		final FileUploadForm file=new FileUploadForm();
 		
-		file.setHeight("50px");
-		file.getElement().setAttribute("multiple", "multiple");
+		file.getFileUpload().setHeight("50px");
+		file.getFileUpload().getElement().setAttribute("multiple", "multiple");
 		
 		
-		file.addChangeHandler(new ChangeHandler() {
+		file.getFileUpload().addChangeHandler(new ChangeHandler() {
 			
 			
 
@@ -850,7 +1131,7 @@ Timer timer=new Timer(){
 				});
 				reader.readAsText(files.get(0),"utf-8");
 				*/
-				
+				file.reset();
 			}
 		});
 		parent.add(file);
@@ -1321,6 +1602,19 @@ Timer timer=new Timer(){
 		dataListCell.setSelection(dataContainer);
 		tabPanel.selectTab(0);
 	}
+	
+public void addBVHDatas(List<BVHDataContainer> dataContainers){
+		
+		for(BVHDataContainer dataContainer:dataContainers){
+		if(!existsBVHData(dataContainer)){
+			bvhFileList.add(dataContainer);
+		}
+		}
+		
+		dataListCell.setDatas(bvhFileList);
+		dataListCell.setSelection(dataContainers.get(0));
+		tabPanel.selectTab(0);
+	}
 	private boolean existsBVHData(BVHDataContainer dataContainer){
 		for(BVHDataContainer container:bvhFileList){
 			if(container.getName().equals(dataContainer.getName())){
@@ -1337,7 +1631,7 @@ Timer timer=new Timer(){
 	}
 	@Override
 	public String getHtml(){
-		return "BVH Motion Creator "+version+"<br/>"+super.getHtml()+". Sample BVH File from <a href='https://sites.google.com/a/cgspeed.com/cgspeed/motion-capture/cmu-bvh-conversion'>CMU Graphics Lab Motion Capture Database.</a><br/> More Infomation click <a href='http://webgl.akjava.com'>webgl.akjava.com</a>";
+		return "BVH Motion Creator ver."+version+"<br/>"+super.getHtml()+". Sample BVH File from <a href='https://sites.google.com/a/cgspeed.com/cgspeed/motion-capture/cmu-bvh-conversion'>CMU Graphics Lab Motion Capture Database.</a><br/> More Infomation click <a href='http://webgl.akjava.com'>webgl.akjava.com</a>";
 	}
 
 	@Override

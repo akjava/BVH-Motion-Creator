@@ -15,6 +15,7 @@ import com.akjava.bvh.client.NameAndChannel;
 import com.akjava.gwt.html5.client.file.File;
 import com.akjava.gwt.html5.client.file.FileHandler;
 import com.akjava.gwt.html5.client.file.FileReader;
+import com.akjava.gwt.html5.client.file.FileUploadForm;
 import com.akjava.gwt.html5.client.file.FileUtils;
 import com.akjava.gwt.lib.client.LogUtils;
 import com.google.gwt.core.client.JsArray;
@@ -40,30 +41,30 @@ private CheckBox loopShort;
 		super(panel);
 
 		
-		FileUpload upload=new FileUpload();
-		upload.getElement().setAttribute("multiple", "multiple");
-		upload.addChangeHandler(new ChangeHandler() {
+		final FileUploadForm upload=new FileUploadForm();
+		upload.getFileUpload().getElement().setAttribute("multiple", "multiple");
+		upload.getFileUpload().addChangeHandler(new ChangeHandler() {
 			
 			@Override
 			public void onChange(ChangeEvent event) {
 				JsArray<File> files=FileUtils.toFile(event.getNativeEvent());
 				
 				setFile(files,true);
-				
+				upload.reset();
 			}
 		});
 		panel.add(upload);
 		
-		FileUpload upload2=new FileUpload();
+		final FileUploadForm upload2=new FileUploadForm();
 		//upload.getElement().setAttribute("multiple", "multiple");
-		upload2.addChangeHandler(new ChangeHandler() {
+		upload2.getFileUpload().addChangeHandler(new ChangeHandler() {
 			
 			@Override
 			public void onChange(ChangeEvent event) {
 				JsArray<File> files=FileUtils.toFile(event.getNativeEvent());
 				
 				setFile(files,false);
-				
+				upload2.reset();
 			}
 		});
 		panel.add(upload2);

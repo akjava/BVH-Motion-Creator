@@ -11,6 +11,7 @@ import com.akjava.bvh.client.BVHWriter;
 import com.akjava.gwt.html5.client.file.File;
 import com.akjava.gwt.html5.client.file.FileHandler;
 import com.akjava.gwt.html5.client.file.FileReader;
+import com.akjava.gwt.html5.client.file.FileUploadForm;
 import com.akjava.gwt.html5.client.file.FileUtils;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
@@ -35,16 +36,16 @@ private Label logLabel;
 		super(panel);
 
 		
-		FileUpload upload=new FileUpload();
+		final FileUploadForm upload=new FileUploadForm();
 		//upload.getElement().setAttribute("multiple", "multiple");
-		upload.addChangeHandler(new ChangeHandler() {
+		upload.getFileUpload().addChangeHandler(new ChangeHandler() {
 			
 			@Override
 			public void onChange(ChangeEvent event) {
 				JsArray<File> files=FileUtils.toFile(event.getNativeEvent());
 				
 				setFile(files);
-				
+				upload.reset();
 			}
 		});
 		panel.add(upload);
