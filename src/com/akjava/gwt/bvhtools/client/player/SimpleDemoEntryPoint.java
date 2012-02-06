@@ -8,7 +8,11 @@ import com.google.gwt.event.dom.client.MouseDownEvent;
 import com.google.gwt.event.dom.client.MouseOutEvent;
 import com.google.gwt.event.dom.client.MouseUpEvent;
 import com.google.gwt.event.dom.client.MouseWheelEvent;
-
+/**
+ * @deprecated
+ * @author aki
+ *
+ */
 public abstract class SimpleDemoEntryPoint extends TabDemoEntryPoint{
 
 	protected Camera camera;

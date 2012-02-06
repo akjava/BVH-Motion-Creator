@@ -1,9 +1,0 @@
-{
-  "appName": {
-    "message": "BVH モーション クリエイター"
-  },
-  "appDesc": {
-    "message": "WebGLベースでBVHモーションファイルを再生します。BVHファイルの変換ツールもあります
-    "
-  }
-}

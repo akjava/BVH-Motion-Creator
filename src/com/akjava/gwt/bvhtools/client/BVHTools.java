@@ -26,7 +26,7 @@ import com.akjava.gwt.bvhtools.client.file.BVHDataContainer;
 import com.akjava.gwt.bvhtools.client.file.BVHDataListener;
 import com.akjava.gwt.bvhtools.client.file.FileDataContainer;
 import com.akjava.gwt.bvhtools.client.file.TextDataContainer;
-import com.akjava.gwt.bvhtools.client.player.SimpleDemoEntryPoint;
+
 import com.akjava.gwt.bvhtools.client.player.list.BVHFileWidget;
 import com.akjava.gwt.bvhtools.client.player.list.DataListCell;
 import com.akjava.gwt.bvhtools.client.player.list.DataListCell.ChangeSelectionListener;
@@ -54,8 +54,10 @@ import com.akjava.gwt.three.client.core.Projector;
 import com.akjava.gwt.three.client.core.Vector3;
 import com.akjava.gwt.three.client.gwt.Clock;
 import com.akjava.gwt.three.client.gwt.Object3DUtils;
+import com.akjava.gwt.three.client.gwt.SimpleDemoEntryPoint;
 import com.akjava.gwt.three.client.gwt.animation.AnimationBone;
 import com.akjava.gwt.three.client.gwt.animation.AnimationBonesData;
+import com.akjava.gwt.three.client.gwt.ui.SimpleTabDemoEntryPoint;
 import com.akjava.gwt.three.client.lights.Light;
 import com.akjava.gwt.three.client.objects.Mesh;
 import com.akjava.gwt.three.client.renderers.WebGLRenderer;
@@ -99,7 +101,7 @@ import com.google.gwt.user.client.ui.Widget;
  * Entry point classes define <code>onModuleLoad()</code>.
  */
 
-public class BVHTools extends SimpleDemoEntryPoint {
+public class BVHTools extends SimpleTabDemoEntryPoint {
 	private String version="3.0";
 	public static DateTimeFormat dateFormat=DateTimeFormat.getFormat("yy/MM/dd HH:mm");
 	private static BVHTools bvhTools;
@@ -260,9 +262,22 @@ public class BVHTools extends SimpleDemoEntryPoint {
 		VerticalPanel expRoot=new VerticalPanel();
 		tabPanel.add(expRoot,"Experimental");
 		
+		
+		Frame doc1=new Frame("pose_help.html");
+		doc1.setSize("500px", "200px");
+		Button bt1=new Button("Open Pose Editor");
+		bt1.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				Window.open("pose.html", "posetool", null);
+			}
+		});
+		expRoot.add(doc1);
+		expRoot.add(bt1);
+		
 		Frame doc=new Frame("weight_help.html");
 		doc.setSize("500px", "200px");
-		Button bt=new Button("Open Skin Weight Tool");
+		Button bt=new Button("Open Model Weight Tool");
 		bt.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {

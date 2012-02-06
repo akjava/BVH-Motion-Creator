@@ -41,6 +41,11 @@ import com.google.gwt.user.client.ui.VerticalPanel;
 /**
  * Entry point classes define <code>onModuleLoad()</code>.
  */
+/**
+ * @deprecated
+ * @author aki
+ *
+ */
 public abstract class TabDemoEntryPoint implements EntryPoint {
 
 	private WebGLRenderer renderer;
