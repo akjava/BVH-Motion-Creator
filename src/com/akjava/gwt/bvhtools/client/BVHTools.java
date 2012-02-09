@@ -102,7 +102,7 @@ import com.google.gwt.user.client.ui.Widget;
  */
 
 public class BVHTools extends SimpleTabDemoEntryPoint {
-	private String version="3.0";
+	private String version="3.1";
 	public static DateTimeFormat dateFormat=DateTimeFormat.getFormat("yy/MM/dd HH:mm");
 	private static BVHTools bvhTools;
 	public static BVHTools getInstance(){
@@ -1421,6 +1421,15 @@ Timer timer=new Timer(){
 		});
 		h6.add(reset6);
 		
+		Button launchPose=new Button("Launch Pose Editor");
+		parent.add(launchPose);
+		launchPose.addClickHandler(new ClickHandler() {
+			
+			@Override
+			public void onClick(ClickEvent event) {
+				Window.open("pose.html", "posetool", null);
+			}
+		});
 		
 		createBottomPanel();
 		showControl();
