@@ -39,10 +39,13 @@ import com.akjava.gwt.bvhtools.client.tools.StripTool;
 import com.akjava.gwt.bvhtools.client.tools.TextTool;
 import com.akjava.gwt.bvhtools.client.tools.ThinTool;
 import com.akjava.gwt.html5.client.HTML5InputRange;
+import com.akjava.gwt.html5.client.InputRangeWidget;
 import com.akjava.gwt.html5.client.extra.HTML5Builder;
 import com.akjava.gwt.html5.client.file.File;
+import com.akjava.gwt.html5.client.file.FileReader;
 import com.akjava.gwt.html5.client.file.FileUploadForm;
 import com.akjava.gwt.html5.client.file.FileUtils;
+import com.akjava.gwt.html5.client.file.ui.DropVerticalPanelBase;
 import com.akjava.gwt.lib.client.LogUtils;
 import com.akjava.gwt.lib.client.StorageControler;
 import com.akjava.gwt.lib.client.widget.cell.util.Benchmark;
@@ -68,6 +71,8 @@ import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.dom.client.DropEvent;
+import com.google.gwt.event.dom.client.DropHandler;
 import com.google.gwt.event.dom.client.MouseMoveEvent;
 import com.google.gwt.event.dom.client.MouseUpEvent;
 import com.google.gwt.event.dom.client.MouseUpHandler;
@@ -700,18 +705,18 @@ datasPanel = new VerticalPanel();
 
 	private Label loadingLabel=new Label();
 	private CheckBox translatePosition;
-	private HTML5InputRange positionYRange;
-	private HTML5InputRange meshScaleX;
-	private HTML5InputRange meshScaleY;
-	private HTML5InputRange meshScaleZ;
-	private HTML5InputRange positionX;
-	private HTML5InputRange positionY;
-	private HTML5InputRange positionZ;
+	private InputRangeWidget positionYRange;
+	private InputRangeWidget meshScaleX;
+	private InputRangeWidget meshScaleY;
+	private InputRangeWidget meshScaleZ;
+	private InputRangeWidget positionX;
+	private InputRangeWidget positionY;
+	private InputRangeWidget positionZ;
 	private PopupPanel bottomPanel;
 	protected boolean playing;
-	private HTML5InputRange positionXRange;
+	private InputRangeWidget positionXRange;
 
-	private HTML5InputRange positionZRange;
+	private InputRangeWidget positionZRange;
 
 	private CheckBox drawBackground;
 
@@ -1055,7 +1060,7 @@ Timer timer=new Timer(){
 		
 		
 		
-		currentFrameRange = new HTML5InputRange(0,1000,0);
+		currentFrameRange = InputRangeWidget.createInputRange(0,1000,0);
 		currentFrameRange.setWidth("420px");
 		pPanel.add(currentFrameRange);
 		
@@ -1095,7 +1100,7 @@ Timer timer=new Timer(){
 	
 	private BVHDataListener bvhDataListener;
 	@Override
-	public void createControl(Panel parent) {
+	public void createControl(DropVerticalPanelBase parent) {
 		bvhDataListener=new BVHDataListener() {
 			
 			@Override
@@ -1105,6 +1110,10 @@ Timer timer=new Timer(){
 		};
 		parent.add(loadingLabel);
 		
+		
+		
+		
+		
 
 		parent.add(new Label("Load BVH File"));
 		final FileUploadForm file=new FileUploadForm();
@@ -1113,10 +1122,29 @@ Timer timer=new Timer(){
 		file.getFileUpload().getElement().setAttribute("multiple", "multiple");
 		
 		
+		parent.addDropHandler(new DropHandler() {
+			@Override
+			public void onDrop(DropEvent event) {
+				event.preventDefault();
+				//final FileReader reader=FileReader.createFileReader();
+				lastSelectedFiles=FileUtils.transferToFile(event.getNativeEvent());
+				
+				FileDataContainer firstOne=null;
+				for(int i=0;i<lastSelectedFiles.length();i++){
+					FileDataContainer container=new FileDataContainer(lastSelectedFiles.get(i));
+					if(i==0){
+						firstOne=container;
+					}
+					bvhFileList.add(container);
+				}
+				
+				dataListCell.setDatas(bvhFileList);
+				dataListCell.setSelection(firstOne);
+				file.reset();
+			}
+		});
+		
 		file.getFileUpload().addChangeHandler(new ChangeHandler() {
-			
-			
-
 			@Override
 			public void onChange(ChangeEvent event) {
 				//Benchmark.start("load");
@@ -1134,28 +1162,6 @@ Timer timer=new Timer(){
 				
 				dataListCell.setDatas(bvhFileList);
 				dataListCell.setSelection(firstOne);
-				//bvhCellList.setRowCount(bvhFileList.size(), true);
-				//bvhCellList.setRowData(bvhFileList);
-				
-				//fileSelectionModel.setSelected(files.get(0), true);
-				
-				/*
-				log("length:"+files.length());
-				GWT.log(files.get(0).getFileName());
-				GWT.log(files.get(0).getFileType());
-				GWT.log(""+files.get(0).getFileSize());
-				log(event.getNativeEvent());
-				final FileReader reader=FileReader.createFileReader();
-				reader.setOnLoad(new FileHandler() {
-					@Override
-					public void onLoad() {
-						//log("load:"+Benchmark.end("load"));
-						//GWT.log(reader.getResultAsString());
-						parseBVH(reader.getResultAsString());
-					}
-				});
-				reader.readAsText(files.get(0),"utf-8");
-				*/
 				file.reset();
 			}
 		});
@@ -1346,7 +1352,7 @@ Timer timer=new Timer(){
 		
 		HorizontalPanel h1=new HorizontalPanel();
 		
-		rotationRange = new HTML5InputRange(-180,180,0);
+		rotationRange = InputRangeWidget.createInputRange(-180,180,0);
 		parent.add(HTML5Builder.createRangeLabel("X-Rotate:", rotationRange));
 		parent.add(h1);
 		h1.add(rotationRange);
@@ -1361,7 +1367,7 @@ Timer timer=new Timer(){
 		
 		HorizontalPanel h2=new HorizontalPanel();
 		
-		rotationYRange = new HTML5InputRange(-180,180,0);
+		rotationYRange = InputRangeWidget.createInputRange(-180,180,0);
 		parent.add(HTML5Builder.createRangeLabel("Y-Rotate:", rotationYRange));
 		parent.add(h2);
 		h2.add(rotationYRange);
@@ -1376,7 +1382,7 @@ Timer timer=new Timer(){
 		
 		
 		HorizontalPanel h3=new HorizontalPanel();
-		rotationZRange = new HTML5InputRange(-180,180,0);
+		rotationZRange = InputRangeWidget.createInputRange(-180,180,0);
 		parent.add(HTML5Builder.createRangeLabel("Z-Rotate:", rotationZRange));
 		parent.add(h3);
 		h3.add(rotationZRange);
@@ -1390,7 +1396,7 @@ Timer timer=new Timer(){
 		h3.add(reset3);
 		
 		HorizontalPanel h4=new HorizontalPanel();
-		positionXRange = new HTML5InputRange(-50,50,0);
+		positionXRange = InputRangeWidget.createInputRange(-50,50,0);
 		parent.add(HTML5Builder.createRangeLabel("X-Position:", positionXRange));
 		parent.add(h4);
 		h4.add(positionXRange);
@@ -1404,7 +1410,7 @@ Timer timer=new Timer(){
 		h4.add(reset4);
 		
 		HorizontalPanel h5=new HorizontalPanel();
-		positionYRange = new HTML5InputRange(-50,50,0);
+		positionYRange = InputRangeWidget.createInputRange(-50,50,0);
 		parent.add(HTML5Builder.createRangeLabel("Y-Position:", positionYRange));
 		parent.add(h5);
 		h5.add(positionYRange);
@@ -1418,7 +1424,7 @@ Timer timer=new Timer(){
 		h5.add(reset5);
 		
 		HorizontalPanel h6=new HorizontalPanel();
-		positionZRange = new HTML5InputRange(-50,50,0);
+		positionZRange = InputRangeWidget.createInputRange(-50,50,0);
 		parent.add(HTML5Builder.createRangeLabel("Z-Position:", positionZRange));
 		parent.add(h6);
 		h6.add(positionZRange);
@@ -1488,9 +1494,9 @@ Timer timer=new Timer(){
 		loadBVH("bvhs/"+g_n[0]+"/"+itemText+".bvh");
 	}
 
-	private HTML5InputRange rotationRange;
-	private HTML5InputRange rotationYRange;
-	private HTML5InputRange rotationZRange;
+	private InputRangeWidget rotationRange;
+	private InputRangeWidget rotationYRange;
+	private InputRangeWidget rotationZRange;
 
 	Object3D boneRoot;
 	
@@ -1499,7 +1505,7 @@ Timer timer=new Timer(){
 	private CheckBox ignoreFirst;
 	
 	//private long ctime;
-	private HTML5InputRange currentFrameRange;
+	private InputRangeWidget currentFrameRange;
 	private Label currentFrameLabel;
 	//private int poseIndex;
 	
@@ -1672,4 +1678,9 @@ public void addBVHDatas(List<BVHDataContainer> dataContainers){
 	public String getTabTitle() {
 		return "BVH Player";
 	}
+
+
+
+
+
 }
