@@ -157,7 +157,7 @@ public class BVHTools extends SimpleTabDemoEntryPoint {
 	private StorageControler storageControler;
 	@Override
 	public void initializeOthers(WebGLRenderer renderer) {
-		log("version:"+version);
+		LogUtils.log("version:"+version);
 		loadDefaultBVH("pose.bvh");
 		storageControler = new StorageControler();
 		bvhTools=this;
@@ -612,8 +612,8 @@ datasPanel = new VerticalPanel();
 	
 	public Mesh createLine(Vec3 from,Vec3 to){
 		Geometry lineG = THREE.Geometry();
-		lineG.vertices().push(THREE.Vertex(THREE.Vector3(from.getX(), from.getY(), from.getY())));
-		lineG.vertices().push(THREE.Vertex(THREE.Vector3(to.getX(), to.getY(), to.getZ())));
+		lineG.vertices().push(THREE.Vector3(from.getX(), from.getY(), from.getY()));
+		lineG.vertices().push(THREE.Vector3(to.getX(), to.getY(), to.getZ()));
 		Mesh line=THREE.Line(lineG, THREE.LineBasicMaterial().color(0).build());
 		return line;
 	}
@@ -666,8 +666,8 @@ datasPanel = new VerticalPanel();
 			end.setPosition(THREE.Vector3(node.getEndSite().getX(), node.getEndSite().getY(), node.getEndSite().getZ()));
 			group.add(end);
 			Geometry lineG = THREE.Geometry();
-			lineG.vertices().push(THREE.Vertex(THREE.Vector3(0, 0, 0)));
-			lineG.vertices().push(THREE.Vertex(THREE.Vector3(node.getEndSite().getX(), node.getEndSite().getY(), node.getEndSite().getZ())));
+			lineG.vertices().push(THREE.Vector3(0, 0, 0));
+			lineG.vertices().push(THREE.Vector3(node.getEndSite().getX(), node.getEndSite().getY(), node.getEndSite().getZ()));
 			Mesh line=THREE.Line(lineG, THREE.LineBasicMaterial().color(0).build());
 			group.add(line);
 			
@@ -746,7 +746,7 @@ public void onError(Request request, Throwable exception) {
 }
 				});
 			} catch (RequestException e) {
-				log(e.getMessage());
+				LogUtils.log(e.getMessage());
 				e.printStackTrace();
 			}
 	}
@@ -774,7 +774,7 @@ public void onError(Request request, Throwable exception) {
 						try {
 							bvhForData=	parser.parse(bvhText);
 						} catch (InvalidLineException e) {
-							log("invalid bvh:"+e.getMessage());
+							LogUtils.log("invalid bvh:"+e.getMessage());
 							e.printStackTrace();
 						}
 					}
@@ -788,7 +788,7 @@ public void onError(Request request, Throwable exception) {
 }
 				});
 			} catch (RequestException e) {
-				log(e.getMessage());
+				LogUtils.log(e.getMessage());
 				e.printStackTrace();
 			}
 	}
@@ -826,7 +826,7 @@ public void onError(Request request, Throwable exception) {
 			
 			@Override
 			public void onFaild(String message) {
-				log(message);
+				LogUtils.log(message);
 			}
 		});
 	}
@@ -1511,7 +1511,7 @@ Timer timer=new Timer(){
 	
 	private void updatePoseIndex(int index){
 		if(index>=bvh.getFrames()){
-			log("invalid frame:"+index);
+			LogUtils.log("invalid frame:"+index);
 			return;
 		}
 		//poseIndex=index;
