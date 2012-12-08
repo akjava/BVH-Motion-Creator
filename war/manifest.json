@@ -1,0 +1,16 @@
+{
+  "name": "BVH Player",
+  "description": "Model Weight Editor",
+  "version": "1.0.1",
+  "app": {
+    "launch": {
+      "local_path": "index.html"
+    }
+  },
+  "icons": {
+    "128": "icon.png"
+  },
+  "permissions": [
+    "unlimitedStorage"
+  ]
+}

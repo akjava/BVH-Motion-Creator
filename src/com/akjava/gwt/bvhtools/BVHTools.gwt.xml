@@ -31,6 +31,6 @@
 <inherits name="com.akjava.gwt.stats.Stats"/>
 <inherits name="com.akjava.gwt.three.Three"/>
 
-<set-property name="user.agent" value="safari,ie9"/>
-<set-property name="threejs.canvasRenderer" value="true"/>
+
+<set-property name="threejs.canvasRenderer" value="false"/>
 </module>

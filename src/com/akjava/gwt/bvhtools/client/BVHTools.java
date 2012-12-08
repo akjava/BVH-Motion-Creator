@@ -46,9 +46,10 @@ import com.akjava.gwt.html5.client.file.FileReader;
 import com.akjava.gwt.html5.client.file.FileUploadForm;
 import com.akjava.gwt.html5.client.file.FileUtils;
 import com.akjava.gwt.html5.client.file.ui.DropVerticalPanelBase;
+import com.akjava.gwt.lib.client.IStorageControler;
 import com.akjava.gwt.lib.client.LogUtils;
 import com.akjava.gwt.lib.client.StorageControler;
-import com.akjava.gwt.lib.client.widget.cell.util.Benchmark;
+import com.akjava.gwt.lib.client.StorageException;
 import com.akjava.gwt.three.client.THREE;
 import com.akjava.gwt.three.client.core.Geometry;
 import com.akjava.gwt.three.client.core.Intersect;
@@ -64,6 +65,7 @@ import com.akjava.gwt.three.client.gwt.ui.SimpleTabDemoEntryPoint;
 import com.akjava.gwt.three.client.lights.Light;
 import com.akjava.gwt.three.client.objects.Mesh;
 import com.akjava.gwt.three.client.renderers.WebGLRenderer;
+import com.akjava.lib.common.utils.Benchmark;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.dom.client.Style.Unit;
@@ -107,7 +109,7 @@ import com.google.gwt.user.client.ui.Widget;
  */
 
 public class BVHTools extends SimpleTabDemoEntryPoint {
-	private String version="3.1.2";
+	private String version="3.2";
 	public static DateTimeFormat dateFormat=DateTimeFormat.getFormat("yy/MM/dd HH:mm");
 	private static BVHTools bvhTools;
 	public static BVHTools getInstance(){
@@ -154,7 +156,7 @@ public class BVHTools extends SimpleTabDemoEntryPoint {
 	
 	private Map<String,BoxData> boxDatas;
 	private VerticalPanel datasPanel;
-	private StorageControler storageControler;
+	private IStorageControler storageControler;
 	@Override
 	public void initializeOthers(WebGLRenderer renderer) {
 		LogUtils.log("version:"+version);
@@ -373,6 +375,7 @@ datasPanel = new VerticalPanel();
 
 	
 	private void updateDatasPanel(){
+		try{
 		datasPanel.clear();
 		int index=storageControler.getValue(PoseEditorData.KEY_INDEX, 0);
 		for(int i=index;i>=0;i--){
@@ -384,6 +387,9 @@ datasPanel = new VerticalPanel();
 			//dp.setSize("200px", "200px");
 			datasPanel.add(dp);
 			}
+		}
+		}catch (StorageException e) {
+			Window.alert("faild getValue:"+e.getMessage());
 		}
 	}
 	
