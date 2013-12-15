@@ -26,7 +26,6 @@ import com.akjava.gwt.bvhtools.client.file.BVHDataContainer;
 import com.akjava.gwt.bvhtools.client.file.BVHDataListener;
 import com.akjava.gwt.bvhtools.client.file.FileDataContainer;
 import com.akjava.gwt.bvhtools.client.file.TextDataContainer;
-
 import com.akjava.gwt.bvhtools.client.player.list.BVHFileWidget;
 import com.akjava.gwt.bvhtools.client.player.list.DataListCell;
 import com.akjava.gwt.bvhtools.client.player.list.DataListCell.ChangeSelectionListener;
@@ -38,11 +37,9 @@ import com.akjava.gwt.bvhtools.client.tools.MixTool;
 import com.akjava.gwt.bvhtools.client.tools.StripTool;
 import com.akjava.gwt.bvhtools.client.tools.TextTool;
 import com.akjava.gwt.bvhtools.client.tools.ThinTool;
-import com.akjava.gwt.html5.client.HTML5InputRange;
 import com.akjava.gwt.html5.client.InputRangeWidget;
 import com.akjava.gwt.html5.client.extra.HTML5Builder;
 import com.akjava.gwt.html5.client.file.File;
-import com.akjava.gwt.html5.client.file.FileReader;
 import com.akjava.gwt.html5.client.file.FileUploadForm;
 import com.akjava.gwt.html5.client.file.FileUtils;
 import com.akjava.gwt.html5.client.file.ui.DropVerticalPanelBase;
@@ -50,21 +47,25 @@ import com.akjava.gwt.lib.client.IStorageControler;
 import com.akjava.gwt.lib.client.LogUtils;
 import com.akjava.gwt.lib.client.StorageControler;
 import com.akjava.gwt.lib.client.StorageException;
-import com.akjava.gwt.three.client.THREE;
-import com.akjava.gwt.three.client.core.Geometry;
-import com.akjava.gwt.three.client.core.Intersect;
-import com.akjava.gwt.three.client.core.Object3D;
-import com.akjava.gwt.three.client.core.Projector;
-import com.akjava.gwt.three.client.core.Vector3;
 import com.akjava.gwt.three.client.gwt.Clock;
 import com.akjava.gwt.three.client.gwt.Object3DUtils;
-import com.akjava.gwt.three.client.gwt.SimpleDemoEntryPoint;
 import com.akjava.gwt.three.client.gwt.animation.AnimationBone;
 import com.akjava.gwt.three.client.gwt.animation.AnimationBonesData;
 import com.akjava.gwt.three.client.gwt.ui.SimpleTabDemoEntryPoint;
-import com.akjava.gwt.three.client.lights.Light;
-import com.akjava.gwt.three.client.objects.Mesh;
-import com.akjava.gwt.three.client.renderers.WebGLRenderer;
+import com.akjava.gwt.three.client.js.THREE;
+import com.akjava.gwt.three.client.js.core.Geometry;
+import com.akjava.gwt.three.client.js.core.Intersect;
+import com.akjava.gwt.three.client.js.core.Object3D;
+import com.akjava.gwt.three.client.js.core.Projector;
+import com.akjava.gwt.three.client.js.lights.Light;
+import com.akjava.gwt.three.client.js.materials.LineBasicMaterialParameter;
+import com.akjava.gwt.three.client.js.materials.MeshBasicMaterialParameter;
+import com.akjava.gwt.three.client.js.materials.MeshLambertMaterialParameter;
+import com.akjava.gwt.three.client.js.math.Euler;
+import com.akjava.gwt.three.client.js.math.Vector3;
+import com.akjava.gwt.three.client.js.objects.Line;
+import com.akjava.gwt.three.client.js.objects.Mesh;
+import com.akjava.gwt.three.client.js.renderers.WebGLRenderer;
 import com.akjava.lib.common.utils.Benchmark;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
@@ -90,13 +91,11 @@ import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.CheckBox;
-import com.google.gwt.user.client.ui.FileUpload;
 import com.google.gwt.user.client.ui.Frame;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.ListBox;
-import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.PopupPanel;
 import com.google.gwt.user.client.ui.ScrollPanel;
 import com.google.gwt.user.client.ui.TabLayoutPanel;
@@ -109,7 +108,7 @@ import com.google.gwt.user.client.ui.Widget;
  */
 
 public class BVHTools extends SimpleTabDemoEntryPoint {
-	private String version="3.2";
+	private String version="4.0";
 	public static DateTimeFormat dateFormat=DateTimeFormat.getFormat("yy/MM/dd HH:mm");
 	private static BVHTools bvhTools;
 	public static BVHTools getInstance(){
@@ -118,6 +117,7 @@ public class BVHTools extends SimpleTabDemoEntryPoint {
 	final Projector projector=THREE.Projector();
 	@Override
 	public void onMouseClick(ClickEvent event) {
+		/* TODO future
 		int x=event.getX();
 		int y=event.getY();
 		
@@ -128,6 +128,7 @@ public class BVHTools extends SimpleTabDemoEntryPoint {
 			Intersect sect=intersects.get(i);
 			break;
 		}
+		*/
 		
 	}
 
@@ -159,13 +160,13 @@ public class BVHTools extends SimpleTabDemoEntryPoint {
 	private IStorageControler storageControler;
 	@Override
 	public void initializeOthers(WebGLRenderer renderer) {
-		LogUtils.log("version:"+version);
-		loadDefaultBVH("pose.bvh");
+		LogUtils.log("BVHTools version:"+version);
+		loadDefaultBVH("pose.bvh"); //i forgot what is this?maybe for some slow network
 		storageControler = new StorageControler();
 		bvhTools=this;
 		cameraY=10;
 		defaultZoom=5;
-		canvas.setClearColorHex(0xcccccc);
+		canvas.setClearColor(0xcccccc);
 		
 		
 		boxDatas=new BoxDataParser().parse(Bundles.INSTANCE.boxsize().getText());
@@ -186,7 +187,7 @@ public class BVHTools extends SimpleTabDemoEntryPoint {
 		Geometry geo=THREE.PlaneGeometry(100, 100,20,20);
 		Mesh mesh=THREE.Mesh(geo, THREE.MeshBasicMaterial().color(0x666666).wireFrame(true).build());
 		//mesh.setPosition(0, -17, 0);
-		mesh.setRotation(Math.toRadians(-90), 0, 0);
+		mesh.getRotation().set(Math.toRadians(-90), 0, 0,Euler.XYZ);
 		backgroundContainer.add(mesh);
 		
 		boneContainer=THREE.Object3D();
@@ -491,9 +492,7 @@ datasPanel = new VerticalPanel();
 	
 	private void doRotation(Object3D target,String lastOrder){
 		//log(target.getName()+",order="+lastOrder+" "+ThreeLog.get(GWTThreeUtils.radiantToDegree(target.getRotation())));
-		Vector3 vec=target.getRotation();
-		
-		target.setEulerOrder(lastOrder);
+		target.getRotation().setOrder(lastOrder);
 		/*
 		Matrix4 mx=THREE.Matrix4();
 		mx.setRotationFromEuler(vec, lastOrder);
@@ -616,11 +615,11 @@ datasPanel = new VerticalPanel();
 	
 	private Map<String,Object3D> jointMap;
 	
-	public Mesh createLine(Vec3 from,Vec3 to){
+	public Line createLine(Vec3 from,Vec3 to){
 		Geometry lineG = THREE.Geometry();
 		lineG.vertices().push(THREE.Vector3(from.getX(), from.getY(), from.getY()));
 		lineG.vertices().push(THREE.Vector3(to.getX(), to.getY(), to.getZ()));
-		Mesh line=THREE.Line(lineG, THREE.LineBasicMaterial().color(0).build());
+		Line line=THREE.Line(lineG, THREE.LineBasicMaterial(LineBasicMaterialParameter.create().color(0)));
 		return line;
 	}
 	
@@ -631,7 +630,7 @@ datasPanel = new VerticalPanel();
 		GWT.log(node.getChannels().toString());
 		
 		Object3D group=THREE.Object3D();
-		Mesh mesh=THREE.Mesh(THREE.CubeGeometry(.4,.4, .4), THREE.MeshLambertMaterial().color(0x00ff00).build());
+		Mesh mesh=THREE.Mesh(THREE.CubeGeometry(.4,.4, .4), THREE.MeshLambertMaterial(MeshLambertMaterialParameter.create().color(0x00ff00)));
 		group.add(mesh);
 		mesh.setName(node.getName());
 		group.setName(node.getName());
@@ -644,7 +643,7 @@ datasPanel = new VerticalPanel();
 		if(half.getX()!=0 || half.getY()!=0 || half.getY()!=0){
 		half.divideScalar(2);
 		//Mesh hmesh=THREE.Mesh(THREE.CubeGeometry(.2,.2,.2), THREE.MeshLambertMaterial().color(0xffffff).build());
-		Mesh hmesh=THREE.Mesh(THREE.CylinderGeometry(.1,.1,.2,6), THREE.MeshLambertMaterial().color(0xffffff).build());
+		Mesh hmesh=THREE.Mesh(THREE.CylinderGeometry(.1,.1,.2,6), THREE.MeshLambertMaterial(MeshLambertMaterialParameter.create().color(0xffffff)));
 		
 		hmesh.setPosition(half);
 		parent.add(hmesh);
@@ -664,24 +663,24 @@ datasPanel = new VerticalPanel();
 		}
 		
 		//line
-		Mesh l1=createLine(new Vec3(),node.getOffset());
+		Line l1=createLine(new Vec3(),node.getOffset());
 		parent.add(l1);
 		
 		if(node.getEndSite()!=null){
-			Mesh end=THREE.Mesh(THREE.CubeGeometry(.1, .1, .1), THREE.MeshBasicMaterial().color(0x008800).build());
+			Mesh end=THREE.Mesh(THREE.CubeGeometry(.1, .1, .1), THREE.MeshBasicMaterial(MeshBasicMaterialParameter.create().color(0x008800)));
 			end.setPosition(THREE.Vector3(node.getEndSite().getX(), node.getEndSite().getY(), node.getEndSite().getZ()));
 			group.add(end);
 			Geometry lineG = THREE.Geometry();
 			lineG.vertices().push(THREE.Vector3(0, 0, 0));
 			lineG.vertices().push(THREE.Vector3(node.getEndSite().getX(), node.getEndSite().getY(), node.getEndSite().getZ()));
-			Mesh line=THREE.Line(lineG, THREE.LineBasicMaterial().color(0).build());
+			Line line=THREE.Line(lineG, THREE.LineBasicMaterial(LineBasicMaterialParameter.create().color(0)));
 			group.add(line);
 			
 			Vector3 half2=end.getPosition().clone();
 			if(half2.getX()!=0 || half2.getY()!=0 || half2.getY()!=0){
 			half2.divideScalar(2);
 			//Mesh hmesh=THREE.Mesh(THREE.CubeGeometry(.1,.1,.1), THREE.MeshLambertMaterial().color(0xffffff).build());
-			Mesh hmesh=THREE.Mesh(THREE.CylinderGeometry(.1,.1,.2,6), THREE.MeshLambertMaterial().color(0xffffff).build());
+			Mesh hmesh=THREE.Mesh(THREE.CylinderGeometry(.1,.1,.2,6), THREE.MeshLambertMaterial(MeshLambertMaterialParameter.create().color(0xffffff)));
 			
 			hmesh.setPosition(half2);
 			group.add(hmesh);
@@ -1567,7 +1566,8 @@ Timer timer=new Timer(){
 		boneContainer.setPosition(positionXRange.getValue(), positionYRange.getValue(), positionZRange.getValue());
 		
 		if(rootGroup!=null){
-		rootGroup.getRotation().set(Math.toRadians(rotationRange.getValue()),Math.toRadians(rotationYRange.getValue()),Math.toRadians(rotationZRange.getValue()));
+			String lastOrder=rootGroup.getRotation().getOrder();
+		rootGroup.getRotation().set(Math.toRadians(rotationRange.getValue()),Math.toRadians(rotationYRange.getValue()),Math.toRadians(rotationZRange.getValue()),lastOrder);
 		}
 		
 		if(bvh!=null){
