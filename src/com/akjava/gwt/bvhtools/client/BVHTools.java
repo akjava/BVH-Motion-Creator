@@ -817,11 +817,13 @@ public void onError(Request request, Throwable exception) {
 				boneRoot=THREE.Object3D();
 				boneContainer.add(boneRoot);
 				doJoint(boneRoot,null,node);
-				GWT.log(tmp);
+				//GWT.log(tmp);
 				int poseIndex=0;
-				if(ignoreFirst.getValue()){
+				GWT.log("f-size:"+bvh.getFrames());
+				if(ignoreFirst.getValue() && bvh.getFrames()>1){
 					poseIndex=1;
 				}
+				
 				
 				clock.update();
 				updatePoseIndex(poseIndex);
@@ -1516,7 +1518,9 @@ Timer timer=new Timer(){
 	
 	private void updatePoseIndex(int index){
 		if(index>=bvh.getFrames()){
-			LogUtils.log("invalid frame:"+index);
+			if(bvh.getFrames()!=1){//1 frame pose usually happen
+				LogUtils.log("invalid frame at:"+index+" of "+bvh.getFrames());
+			}
 			return;
 		}
 		//poseIndex=index;
