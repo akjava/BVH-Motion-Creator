@@ -74,6 +74,7 @@ import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.dom.client.DoubleClickEvent;
 import com.google.gwt.event.dom.client.DropEvent;
 import com.google.gwt.event.dom.client.DropHandler;
 import com.google.gwt.event.dom.client.MouseMoveEvent;
@@ -1687,6 +1688,15 @@ public void addBVHDatas(List<BVHDataContainer> dataContainers){
 	@Override
 	public String getTabTitle() {
 		return "BVH Player";
+	}
+
+
+
+
+	@Override
+	public void onDoubleClick(DoubleClickEvent event) {
+		// TODO Auto-generated method stub
+		
 	}
 
 
