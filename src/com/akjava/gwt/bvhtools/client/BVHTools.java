@@ -51,7 +51,7 @@ import com.akjava.gwt.three.client.gwt.Clock;
 import com.akjava.gwt.three.client.gwt.Object3DUtils;
 import com.akjava.gwt.three.client.gwt.animation.AnimationBone;
 import com.akjava.gwt.three.client.gwt.animation.AnimationBonesData;
-import com.akjava.gwt.three.client.gwt.ui.SimpleTabDemoEntryPoint;
+import com.akjava.gwt.three.client.java.ui.SimpleTabDemoEntryPoint;
 import com.akjava.gwt.three.client.js.THREE;
 import com.akjava.gwt.three.client.js.core.Geometry;
 import com.akjava.gwt.three.client.js.core.Intersect;
