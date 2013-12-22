@@ -47,20 +47,20 @@ import com.akjava.gwt.lib.client.IStorageControler;
 import com.akjava.gwt.lib.client.LogUtils;
 import com.akjava.gwt.lib.client.StorageControler;
 import com.akjava.gwt.lib.client.StorageException;
-import com.akjava.gwt.three.client.gwt.Clock;
-import com.akjava.gwt.three.client.gwt.Object3DUtils;
 import com.akjava.gwt.three.client.gwt.animation.AnimationBone;
 import com.akjava.gwt.three.client.gwt.animation.AnimationBonesData;
+import com.akjava.gwt.three.client.gwt.core.Intersect;
+import com.akjava.gwt.three.client.gwt.materials.LineBasicMaterialParameter;
+import com.akjava.gwt.three.client.gwt.materials.MeshBasicMaterialParameter;
+import com.akjava.gwt.three.client.gwt.materials.MeshLambertMaterialParameter;
+import com.akjava.gwt.three.client.java.JClock;
 import com.akjava.gwt.three.client.java.ui.SimpleTabDemoEntryPoint;
+import com.akjava.gwt.three.client.java.utils.Object3DUtils;
 import com.akjava.gwt.three.client.js.THREE;
 import com.akjava.gwt.three.client.js.core.Geometry;
-import com.akjava.gwt.three.client.js.core.Intersect;
 import com.akjava.gwt.three.client.js.core.Object3D;
 import com.akjava.gwt.three.client.js.core.Projector;
 import com.akjava.gwt.three.client.js.lights.Light;
-import com.akjava.gwt.three.client.js.materials.LineBasicMaterialParameter;
-import com.akjava.gwt.three.client.js.materials.MeshBasicMaterialParameter;
-import com.akjava.gwt.three.client.js.materials.MeshLambertMaterialParameter;
 import com.akjava.gwt.three.client.js.math.Euler;
 import com.akjava.gwt.three.client.js.math.Vector3;
 import com.akjava.gwt.three.client.js.objects.Line;
@@ -1530,7 +1530,7 @@ Timer timer=new Timer(){
 		doPose(bvh,bvh.getFrameAt(index));
 	}
 	
-	Clock clock=new Clock();
+	JClock clock=new JClock();
 	private List<BVHDataContainer> bvhFileList=new ArrayList<BVHDataContainer>();
 	//private CellList<File> bvhCellList;
 	//private SingleSelectionModel<File> fileSelectionModel;
