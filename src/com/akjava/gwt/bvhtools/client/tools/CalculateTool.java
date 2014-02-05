@@ -313,7 +313,7 @@ private VerticalPanel panel;
 			NameAndChannel nchannel=bvh.getNameAndChannels().get(i);
 			lastOrder=nchannel.getOrder();
 			ResultData target=resultMap.get(nchannel.getName());
-			GWT.log("target:"+target);
+			//GWT.log("target:"+target);
 			switch(nchannel.getChannel()){
 			case Channels.XROTATION:
 				target.setMinX(Math.toRadians(vs[i]));
