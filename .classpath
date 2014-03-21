@@ -2,11 +2,11 @@
 <classpath>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry kind="con" path="com.google.gwt.eclipse.core.GWT_CONTAINER/gwt-2.4.0"/>
 	<classpathentry kind="lib" path="lib/akjavastatgwt_120820.jar"/>
 	<classpathentry kind="lib" path="lib/akjavahtml5gwt_131220.jar"/>
 	<classpathentry kind="lib" path="lib/akjavalibbvh_131220.jar"/>
 	<classpathentry kind="lib" path="lib/akjavalibgwt-dep_131220.jar"/>
 	<classpathentry kind="lib" path="lib/akjavathreegwt_131220.jar"/>
+	<classpathentry kind="con" path="com.google.gwt.eclipse.core.GWT_CONTAINER"/>
 	<classpathentry kind="output" path="war/WEB-INF/classes"/>
 </classpath>
