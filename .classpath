@@ -6,7 +6,7 @@
 	<classpathentry kind="lib" path="lib/akjavahtml5gwt_131220.jar"/>
 	<classpathentry kind="lib" path="lib/akjavalibbvh_131220.jar"/>
 	<classpathentry kind="lib" path="lib/akjavalibgwt-dep_131220.jar"/>
-	<classpathentry kind="lib" path="lib/akjavathreegwt_131220.jar"/>
 	<classpathentry kind="con" path="com.google.gwt.eclipse.core.GWT_CONTAINER"/>
+	<classpathentry kind="lib" path="lib/akjavathreegwt_140325_for_r66.jar"/>
 	<classpathentry kind="output" path="war/WEB-INF/classes"/>
 </classpath>

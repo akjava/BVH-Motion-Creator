@@ -109,7 +109,7 @@ import com.google.gwt.user.client.ui.Widget;
  */
 
 public class BVHTools extends SimpleTabDemoEntryPoint {
-	private String version="5.0(for r64)";
+	private String version="5.0.1(for r66)";
 	public static DateTimeFormat dateFormat=DateTimeFormat.getFormat("yy/MM/dd HH:mm");
 	private static BVHTools bvhTools;
 	public static BVHTools getInstance(){
