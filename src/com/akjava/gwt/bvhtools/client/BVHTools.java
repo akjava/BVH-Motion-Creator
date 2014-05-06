@@ -651,14 +651,16 @@ datasPanel = new VerticalPanel();
 		bodyMeshs.add(hmesh);
 		
 		
-		BoxData data=boxDatas.get(pNode.getName());
-		if(data!=null){
-			hmesh.setScale(data.getScaleX(), data.getScaleY(), data.getScaleZ());
-			hmesh.getRotation().setZ(Math.toRadians(data.getRotateZ()));
-		}
+		
 		
 		if(pNode!=null){//TODO remove
 			tmp+=pNode.getName()+",1,1,1\n";
+			
+			BoxData data=boxDatas.get(pNode.getName());//
+			if(data!=null){
+				hmesh.setScale(data.getScaleX(), data.getScaleY(), data.getScaleZ());
+				hmesh.getRotation().setZ(Math.toRadians(data.getRotateZ()));
+			}
 		}
 		
 		}
