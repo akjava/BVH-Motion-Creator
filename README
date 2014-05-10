@@ -1,5 +1,16 @@
 GWT BVH Motion Creator
+===
 
+This project is potal
+
+https://github.com/akjava/BVH-Pose-Editor
+New BVH Pose Editor
+
+Demo http://game.akjava.com/pose/
+
+
+Old Version
+-------
 Player & Tools
 
 lib-bvh for java/gwt
@@ -9,10 +20,10 @@ included BVH files from CMU Graphics Lab Motion Capture Database
 https://sites.google.com/a/cgspeed.com/cgspeed/motion-capture/cmu-bvh-conversion
 
 
-English Web Site
+English Web Site(old version)
 http://webgl.akjava.com
 
-Japanese Web Site
+Japanese Web Site(old version)
 http://webgl.akjava.com/bvh/bvh-motion-creator
 
 ---
