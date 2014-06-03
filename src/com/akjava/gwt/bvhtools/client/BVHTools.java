@@ -167,7 +167,10 @@ public class BVHTools extends SimpleTabDemoEntryPoint {
 		bvhTools=this;
 		cameraY=10;
 		defaultZoom=5;
-		canvas.setClearColor(0xcccccc);
+		
+		
+		renderer.setClearColor(0, 0);//use transparent
+		canvas.setBackground(0xcccccc);
 		
 		
 		boxDatas=new BoxDataParser().parse(Bundles.INSTANCE.boxsize().getText());
@@ -242,11 +245,11 @@ public class BVHTools extends SimpleTabDemoEntryPoint {
 				if(selection==0){
 					stats.setVisible(true);
 					showControl();
-					dialog2.setVisible(true);
+					popupPanel.setVisible(true);
 				}else{
 				stats.setVisible(false);
 				hideControl();
-				dialog2.setVisible(false);
+				popupPanel.setVisible(false);
 				}
 			}
 		});
@@ -693,7 +696,7 @@ datasPanel = new VerticalPanel();
 			if(data!=null){
 				hmesh.setScale(data.getScaleX(), data.getScaleY(), data.getScaleZ());
 			}
-			if(node.getName().equals("Head")){
+			if(node.getName().equals("Head")){//why?
 				hmesh.getPosition().setZ(hmesh.getPosition().getZ()+0.5);
 			}
 			bodyMeshs.add(hmesh);
