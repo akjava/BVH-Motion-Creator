@@ -822,6 +822,11 @@ public void onError(Request request, Throwable exception) {
 				}
 				boneRoot=THREE.Object3D();
 				boneContainer.add(boneRoot);
+				
+				//possible bone root is not 0
+				boneRoot.setPosition(node.getOffset().getX(),node.getOffset().getY(),node.getOffset().getZ());
+				
+				
 				doJoint(boneRoot,null,node);
 				//GWT.log(tmp);
 				int poseIndex=0;
@@ -1130,6 +1135,7 @@ Timer timer=new Timer(){
 
 		parent.add(new Label("Load BVH File"));
 		final FileUploadForm file=new FileUploadForm();
+		file.setAccept(".bvh");
 		
 		file.getFileUpload().setHeight("50px");
 		file.getFileUpload().getElement().setAttribute("multiple", "multiple");
