@@ -630,6 +630,13 @@ datasPanel = new VerticalPanel();
 	private List<Object3D> bodyMeshs=new ArrayList<Object3D>();
 	String tmp="";
 	public void doJoint(Object3D parent,BVHNode pNode,BVHNode node){
+		
+		if(pNode!=null){
+			LogUtils.log(pNode.getName()+","+node.getName());
+		}else{
+			LogUtils.log(null+","+node.getName());
+		}
+		
 		GWT.log(node.getName()+","+node.getOffset()+",endsite:"+node.getEndSite());
 		GWT.log(node.getChannels().toString());
 		
@@ -647,30 +654,37 @@ datasPanel = new VerticalPanel();
 		if(half.getX()!=0 || half.getY()!=0 || half.getY()!=0){
 		half.divideScalar(2);
 		//Mesh hmesh=THREE.Mesh(THREE.CubeGeometry(.2,.2,.2), THREE.MeshLambertMaterial().color(0xffffff).build());
-		Mesh hmesh=THREE.Mesh(THREE.CylinderGeometry(.1,.1,.2,6), THREE.MeshLambertMaterial(MeshLambertMaterialParameter.create().color(0xffffff)));
+		Mesh halfMesh=THREE.Mesh(THREE.CylinderGeometry(.1,.1,.2,6), THREE.MeshLambertMaterial(MeshLambertMaterialParameter.create().color(0xffffff)));
 		
-		hmesh.setPosition(half);
-		parent.add(hmesh);
-		bodyMeshs.add(hmesh);
-		
-		
+		halfMesh.setPosition(half);
+		parent.add(halfMesh);
+		bodyMeshs.add(halfMesh);
 		
 		
-		if(pNode!=null){//TODO remove
+		
+		
+		
+		if(pNode!=null){
 			tmp+=pNode.getName()+",1,1,1\n";
 			
+			
+			//this is supported-bone structor.
 			BoxData data=boxDatas.get(pNode.getName());//
 			if(data!=null){
-				hmesh.setScale(data.getScaleX(), data.getScaleY(), data.getScaleZ());
-				hmesh.getRotation().setZ(Math.toRadians(data.getRotateZ()));
+				halfMesh.setScale(data.getScaleX(), data.getScaleY(), data.getScaleZ());
+				halfMesh.getRotation().setZ(Math.toRadians(data.getRotateZ()));
 			}
 		}
+		
 		
 		}
 		
 		//line
-		Line l1=createLine(new Vec3(),node.getOffset());
-		parent.add(l1);
+		Line lineMesh=createLine(new Vec3(),node.getOffset());
+		
+		if(pNode!=null){
+			parent.add(lineMesh);
+		}
 		
 		if(node.getEndSite()!=null){
 			Mesh end=THREE.Mesh(THREE.CubeGeometry(.1, .1, .1), THREE.MeshBasicMaterial(MeshBasicMaterialParameter.create().color(0x008800)));
@@ -690,15 +704,18 @@ datasPanel = new VerticalPanel();
 			
 			hmesh.setPosition(half2);
 			group.add(hmesh);
+			
 			tmp+=node.getName()+",1,1,1\n";
 			
+			//this is special treatment for bone.
 			BoxData data=boxDatas.get(node.getName());
 			if(data!=null){
 				hmesh.setScale(data.getScaleX(), data.getScaleY(), data.getScaleZ());
 			}
-			if(node.getName().equals("Head")){//why?
-				hmesh.getPosition().setZ(hmesh.getPosition().getZ()+0.5);
+			if(node.getName().equals("Head")){//why need this?
+			//	hmesh.getPosition().setZ(hmesh.getPosition().getZ()+0.5);
 			}
+			
 			bodyMeshs.add(hmesh);
 			
 			}
