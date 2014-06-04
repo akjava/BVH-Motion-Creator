@@ -6,6 +6,8 @@ import com.google.gwt.resources.client.TextResource;
 
 public interface Bundles extends ClientBundle {
 public static Bundles INSTANCE=GWT.create(Bundles.class);
-	TextResource boxsize();
 
+	@Source("standard_cmu.txt")
+	TextResource standard_cmu();
+	TextResource small_cmu();
 }

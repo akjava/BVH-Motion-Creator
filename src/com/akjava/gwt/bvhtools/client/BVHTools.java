@@ -1,5 +1,6 @@
 package com.akjava.gwt.bvhtools.client;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -38,6 +39,7 @@ import com.akjava.gwt.bvhtools.client.tools.StripTool;
 import com.akjava.gwt.bvhtools.client.tools.TextTool;
 import com.akjava.gwt.bvhtools.client.tools.ThinTool;
 import com.akjava.gwt.html5.client.InputRangeWidget;
+import com.akjava.gwt.html5.client.download.HTML5Download;
 import com.akjava.gwt.html5.client.extra.HTML5Builder;
 import com.akjava.gwt.html5.client.file.File;
 import com.akjava.gwt.html5.client.file.FileUploadForm;
@@ -49,7 +51,6 @@ import com.akjava.gwt.lib.client.StorageControler;
 import com.akjava.gwt.lib.client.StorageException;
 import com.akjava.gwt.three.client.gwt.animation.AnimationBone;
 import com.akjava.gwt.three.client.gwt.animation.AnimationBonesData;
-import com.akjava.gwt.three.client.gwt.core.Intersect;
 import com.akjava.gwt.three.client.gwt.materials.LineBasicMaterialParameter;
 import com.akjava.gwt.three.client.gwt.materials.MeshBasicMaterialParameter;
 import com.akjava.gwt.three.client.gwt.materials.MeshLambertMaterialParameter;
@@ -67,6 +68,7 @@ import com.akjava.gwt.three.client.js.objects.Line;
 import com.akjava.gwt.three.client.js.objects.Mesh;
 import com.akjava.gwt.three.client.js.renderers.WebGLRenderer;
 import com.akjava.lib.common.utils.Benchmark;
+import com.google.common.collect.Lists;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.dom.client.Style.Unit;
@@ -82,6 +84,8 @@ import com.google.gwt.event.dom.client.MouseUpEvent;
 import com.google.gwt.event.dom.client.MouseUpHandler;
 import com.google.gwt.event.logical.shared.SelectionEvent;
 import com.google.gwt.event.logical.shared.SelectionHandler;
+import com.google.gwt.event.logical.shared.ValueChangeEvent;
+import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.RequestBuilder;
 import com.google.gwt.http.client.RequestCallback;
@@ -89,7 +93,10 @@ import com.google.gwt.http.client.RequestException;
 import com.google.gwt.http.client.Response;
 import com.google.gwt.http.client.URL;
 import com.google.gwt.i18n.client.DateTimeFormat;
+import com.google.gwt.resources.client.TextResource;
+import com.google.gwt.text.shared.Renderer;
 import com.google.gwt.user.client.Window;
+import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.Frame;
@@ -101,6 +108,7 @@ import com.google.gwt.user.client.ui.PopupPanel;
 import com.google.gwt.user.client.ui.ScrollPanel;
 import com.google.gwt.user.client.ui.TabLayoutPanel;
 import com.google.gwt.user.client.ui.TextBox;
+import com.google.gwt.user.client.ui.ValueListBox;
 import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
 
@@ -173,7 +181,8 @@ public class BVHTools extends SimpleTabDemoEntryPoint {
 		canvas.setBackground(0xcccccc);
 		
 		
-		boxDatas=new BoxDataParser().parse(Bundles.INSTANCE.boxsize().getText());
+		//boxDatas=new BoxDataParser().parse(Bundles.INSTANCE.boxsize().getText());
+		boxDatas=new HashMap<String, BoxData>();
 		
 		scene.add(THREE.AmbientLight(0x888888));
 		Light pointLight = THREE.PointLight(0xffffff);
@@ -257,8 +266,11 @@ public class BVHTools extends SimpleTabDemoEntryPoint {
 		toolsPanel = new TabLayoutPanel(24,Unit.PX);
 		tabPanel.add(toolsPanel,"Tools");
 		
-		createDataPanel();
-		createExperimentalPanel();
+		//data is not compatible anymore
+		//createDataPanel();
+		
+		//no need experimental
+		//createExperimentalPanel();
 		
 		new MergeTool(createTabVerticalPanel("Merge"));	
 		new ThinTool(createTabVerticalPanel("ThinOut"));	
@@ -380,7 +392,11 @@ datasPanel = new VerticalPanel();
 
 	
 	private void updateDatasPanel(){
+		if(datasPanel==null){
+			return;
+		}
 		try{
+			
 		datasPanel.clear();
 		int index=storageControler.getValue(PoseEditorData.KEY_INDEX, 0);
 		for(int i=index;i>=0;i--){
@@ -628,8 +644,12 @@ datasPanel = new VerticalPanel();
 	}
 	
 	private List<Object3D> bodyMeshs=new ArrayList<Object3D>();
+	
+	
+	double baseBoneSize=0.4;
 	String tmp="";
 	public void doJoint(Object3D parent,BVHNode pNode,BVHNode node){
+		
 		
 		if(pNode!=null){
 			LogUtils.log(pNode.getName()+","+node.getName());
@@ -641,7 +661,7 @@ datasPanel = new VerticalPanel();
 		GWT.log(node.getChannels().toString());
 		
 		Object3D group=THREE.Object3D();
-		Mesh mesh=THREE.Mesh(THREE.CubeGeometry(.4,.4, .4), THREE.MeshLambertMaterial(MeshLambertMaterialParameter.create().color(0x00ff00)));
+		Mesh mesh=THREE.Mesh(THREE.CubeGeometry(baseBoneSize,baseBoneSize,baseBoneSize), THREE.MeshLambertMaterial(MeshLambertMaterialParameter.create().color(0x00ff00)));
 		group.add(mesh);
 		mesh.setName(node.getName());
 		group.setName(node.getName());
@@ -654,12 +674,15 @@ datasPanel = new VerticalPanel();
 		if(half.getX()!=0 || half.getY()!=0 || half.getY()!=0){
 		half.divideScalar(2);
 		//Mesh hmesh=THREE.Mesh(THREE.CubeGeometry(.2,.2,.2), THREE.MeshLambertMaterial().color(0xffffff).build());
-		Mesh halfMesh=THREE.Mesh(THREE.CylinderGeometry(.1,.1,.2,6), THREE.MeshLambertMaterial(MeshLambertMaterialParameter.create().color(0xffffff)));
+		Mesh halfMesh=THREE.Mesh(THREE.CylinderGeometry(baseBoneSize/4,baseBoneSize/4,baseBoneSize/2,6), THREE.MeshLambertMaterial(MeshLambertMaterialParameter.create().color(0xffffff)));
 		
 		halfMesh.setPosition(half);
+		
+		if(pNode!=null){
 		parent.add(halfMesh);
 		bodyMeshs.add(halfMesh);
 		
+		}
 		
 		
 		
@@ -687,7 +710,7 @@ datasPanel = new VerticalPanel();
 		}
 		
 		if(node.getEndSite()!=null){
-			Mesh end=THREE.Mesh(THREE.CubeGeometry(.1, .1, .1), THREE.MeshBasicMaterial(MeshBasicMaterialParameter.create().color(0x008800)));
+			Mesh end=THREE.Mesh(THREE.CubeGeometry(baseBoneSize/4,baseBoneSize/4,baseBoneSize/4), THREE.MeshBasicMaterial(MeshBasicMaterialParameter.create().color(0x008800)));
 			end.setPosition(THREE.Vector3(node.getEndSite().getX(), node.getEndSite().getY(), node.getEndSite().getZ()));
 			group.add(end);
 			Geometry lineG = THREE.Geometry();
@@ -700,7 +723,7 @@ datasPanel = new VerticalPanel();
 			if(half2.getX()!=0 || half2.getY()!=0 || half2.getY()!=0){
 			half2.divideScalar(2);
 			//Mesh hmesh=THREE.Mesh(THREE.CubeGeometry(.1,.1,.1), THREE.MeshLambertMaterial().color(0xffffff).build());
-			Mesh hmesh=THREE.Mesh(THREE.CylinderGeometry(.1,.1,.2,6), THREE.MeshLambertMaterial(MeshLambertMaterialParameter.create().color(0xffffff)));
+			Mesh hmesh=THREE.Mesh(THREE.CylinderGeometry(baseBoneSize/4,baseBoneSize/4,baseBoneSize/2,6), THREE.MeshLambertMaterial(MeshLambertMaterialParameter.create().color(0xffffff)));
 			
 			hmesh.setPosition(half2);
 			group.add(hmesh);
@@ -821,6 +844,37 @@ public void onError(Request request, Throwable exception) {
 			}
 	}
 	
+	private void setBVH(BVH bv){
+		bvh=bv;
+		bvh.setSkips(skipFrames);
+		
+		BVHNode node=bvh.getHiearchy();
+		
+		if(boneRoot!=null){
+			boneContainer.remove(boneRoot);
+		}
+		boneRoot=THREE.Object3D();
+		boneContainer.add(boneRoot);
+		
+		//possible bone root is not 0
+		boneRoot.setPosition(node.getOffset().getX(),node.getOffset().getY(),node.getOffset().getZ());
+		
+		
+		doJoint(boneRoot,null,node);
+		//GWT.log(tmp);
+		int poseIndex=0;
+		GWT.log("f-size:"+bvh.getFrames());
+		if(ignoreFirst.getValue() && bvh.getFrames()>1){
+			poseIndex=1;
+		}
+		
+		
+		clock.update();
+		updatePoseIndex(poseIndex);
+		doPose(bvh,bvh.getFrameAt(poseIndex));
+		currentFrameRange.setMax(bvh.getFrames()-1);
+	}
+	
 	private void parseBVH(String bvhText){
 		final BVHParser parser=new BVHParser();
 		jointMap=new HashMap<String,Object3D>();
@@ -829,34 +883,7 @@ public void onError(Request request, Throwable exception) {
 			
 			@Override
 			public void onSuccess(BVH bv) {
-				bvh=bv;
-				bvh.setSkips(skipFrames);
-				
-				BVHNode node=bvh.getHiearchy();
-				
-				if(boneRoot!=null){
-					boneContainer.remove(boneRoot);
-				}
-				boneRoot=THREE.Object3D();
-				boneContainer.add(boneRoot);
-				
-				//possible bone root is not 0
-				boneRoot.setPosition(node.getOffset().getX(),node.getOffset().getY(),node.getOffset().getZ());
-				
-				
-				doJoint(boneRoot,null,node);
-				//GWT.log(tmp);
-				int poseIndex=0;
-				GWT.log("f-size:"+bvh.getFrames());
-				if(ignoreFirst.getValue() && bvh.getFrames()>1){
-					poseIndex=1;
-				}
-				
-				
-				clock.update();
-				updatePoseIndex(poseIndex);
-				doPose(bvh,bvh.getFrameAt(poseIndex));
-				currentFrameRange.setMax(bvh.getFrames()-1);
+			setBVH(bv);
 			}
 			
 			@Override
@@ -1381,7 +1408,7 @@ Timer timer=new Timer(){
 		});
 		
 		ignoreFirst = new CheckBox("Ignore First Frame(Usually Pose)");
-		ignoreFirst.setValue(true);
+		ignoreFirst.setValue(false);//only cmu
 		parent.add(ignoreFirst);
 		
 		
@@ -1473,6 +1500,7 @@ Timer timer=new Timer(){
 		});
 		h6.add(reset6);
 		
+		/*
 		Button launchPose=new Button("Launch Pose Editor");
 		parent.add(launchPose);
 		launchPose.addClickHandler(new ClickHandler() {
@@ -1482,9 +1510,117 @@ Timer timer=new Timer(){
 				Window.open("pose.html", "posetool", null);
 			}
 		});
+		*/
+		
+		List<Double> boneSizes=Lists.newArrayList(0.1,0.2,0.4,0.8,1.0,2.0);
+		ValueListBox<Double> boneSizeListBox=new ValueListBox<Double>(new Renderer<Double>() {
+
+			@Override
+			public String render(Double object) {
+				return String.valueOf(object);
+			}
+
+			@Override
+			public void render(Double object, Appendable appendable) throws IOException {
+				// TODO Auto-generated method stub
+				
+			}
+		});
+		boneSizeListBox.setValue(baseBoneSize);
+		boneSizeListBox.setAcceptableValues(boneSizes);
+		boneSizeListBox.addValueChangeHandler(new ValueChangeHandler<Double>() {
+			@Override
+			public void onValueChange(ValueChangeEvent<Double> event) {
+				baseBoneSize=event.getValue();
+				setBVH(bvh);//re-set
+			}
+		});
+		
+		HorizontalPanel jointSizesPanel=new HorizontalPanel();
+		jointSizesPanel.setVerticalAlignment(HorizontalPanel.ALIGN_MIDDLE);
+		jointSizesPanel.add(new Label("Joint-Size"));
+		jointSizesPanel.add(boneSizeListBox);
+		parent.add(jointSizesPanel);
+		
+		List<TextResource> presets=Lists.newArrayList(null,Bundles.INSTANCE.standard_cmu(),Bundles.INSTANCE.small_cmu());
+		
+		ValueListBox<TextResource> presetBox=new ValueListBox<TextResource>(new Renderer<TextResource>() {
+
+			@Override
+			public String render(TextResource object) {
+				if(object==null){
+					return "no use";
+				}else{
+					return object.getName();
+				}
+				//return null;
+			}
+
+			@Override
+			public void render(TextResource object, Appendable appendable) throws IOException {
+				// TODO Auto-generated method stub
+				
+			}
+		});
+		
+		presetBox.addValueChangeHandler(new ValueChangeHandler<TextResource>() {
+
+			@Override
+			public void onValueChange(ValueChangeEvent<TextResource> event) {
+				if(event.getValue()==null){
+					boxDatas=new HashMap<String, BoxData>();
+				}else{
+					boxDatas=new BoxDataParser().parse(event.getValue().getText());
+				}
+				
+				setBVH(bvh);//re-set
+			}
+			
+		});
+		
+		presetBox.setAcceptableValues(presets);
+		
+		HorizontalPanel presetPanel=new HorizontalPanel();
+		presetPanel.setVerticalAlignment(HorizontalPanel.ALIGN_MIDDLE);
+		presetPanel.add(new Label("Joint-Preset"));
+		presetPanel.add(presetBox);
+		parent.add(presetPanel);
+		
+		HorizontalPanel screenshotPanel=new HorizontalPanel();
+		screenshotPanel.setVerticalAlignment(HorizontalPanel.ALIGN_MIDDLE);
+		parent.add(screenshotPanel);
+		
+		screenshotContainer = new HorizontalPanel();
+		
+		Button screenShot=new Button("Screenshot",new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+			reserveScreenShot=true;	
+			}
+		});
+		screenshotPanel.add(screenShot);
+		screenshotPanel.add(screenshotContainer);
 		
 		createBottomPanel();
 		showControl();
+	}
+	private boolean reserveScreenShot;
+	
+	public class TextResourceAndName{
+		TextResource resource;
+		public TextResource getResource() {
+			return resource;
+		}
+		public void setResource(TextResource resource) {
+			this.resource = resource;
+		}
+		public String getName() {
+			return name;
+		}
+		public void setName(String name) {
+			this.name = name;
+		}
+		String name;
 	}
 
 	protected void doReload() {
@@ -1574,6 +1710,7 @@ Timer timer=new Timer(){
 	private CheckBox abLoopCheck;
 
 	private TabLayoutPanel toolsPanel;
+	private HorizontalPanel screenshotContainer;
 	@Override
 	protected void beforeUpdate(WebGLRenderer renderer) {
 		
@@ -1669,6 +1806,19 @@ Timer timer=new Timer(){
 			}
 	
 		}
+		
+		if(reserveScreenShot){//get renderer before clear;
+			doScreenshot();
+			reserveScreenShot=false;
+		}
+	}
+	
+	private void doScreenshot(){
+		screenshotContainer.clear();
+		canvas.getRenderer().render(scene, camera);//do render here
+		String url=canvas.getRenderer().gwtPngDataUrl();
+		Anchor anchor=HTML5Download.get().generateBase64DownloadLink(url, "image/png", "screenshot.png", "download", true);
+		screenshotContainer.add(anchor);
 	}
 	
 	public void addBVHData(BVHDataContainer dataContainer){
