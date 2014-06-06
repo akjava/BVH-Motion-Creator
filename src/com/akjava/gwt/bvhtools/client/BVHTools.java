@@ -1860,7 +1860,7 @@ public void addBVHDatas(List<BVHDataContainer> dataContainers){
 	}
 	@Override
 	public String getHtml(){
-		return "BVH Motion Creator ver."+version+"<br/>"+super.getHtml()+". Sample BVH File from <a href='https://sites.google.com/a/cgspeed.com/cgspeed/motion-capture/cmu-bvh-conversion'>CMU Graphics Lab Motion Capture Database.</a><br/> More Infomation click <a href='http://webgl.akjava.com'>webgl.akjava.com</a>";
+		return "BVH Motion Creator ver."+version+"<br/>"+super.getHtml()+". Sample BVH File from <a href='https://sites.google.com/a/cgspeed.com/cgspeed/motion-capture/cmu-bvh-conversion'>CMU Graphics Lab Motion Capture Database.</a><br/> More Infomation click <a href='https://github.com/akjava/BVH-Motion-Creator'>https://github.com/akjava/BVH-Motion-Creator</a>";
 	}
 
 	@Override
