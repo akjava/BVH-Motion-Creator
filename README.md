@@ -1,5 +1,11 @@
 GWT BVH Motion Creator
 ===
+Current Status 2019
+====
+I switch Focus developing from GWT to Javascript
+
+below example is almost same(exclude BVH Export)
+https://akjava.github.io/ThreeCharacterExamples/WebContent/tools/bone/boneanimation/
 
 Goal
 ====
